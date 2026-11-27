@@ -1,0 +1,1228 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0b1538"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Waste Monitor"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><style>html,body{margin:0;background:#0b1538}</style></head><body><title>Paper Bag Waste Monitor</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+/* Layout: glass sidebar and deep-blue gradient work area on desktop; bottom tab bar on phones. Depth comes from glass cards, glossy 3D blue shapes and a gentle pointer tilt. */
+:root{
+  color-scheme:dark;
+  --navy:#0a1432; --navy-2:rgba(255,255,255,.1); --navy-ink:#b4c3e6; --navy-line:rgba(255,255,255,.1);
+  --bg:#0a1330; --surface:rgba(255,255,255,.07); --surface-2:rgba(255,255,255,.055); --surface-3:rgba(255,255,255,.17); --solid:#14234f;
+  --ink:#f3f6ff; --muted:#a9b8da; --line:rgba(255,255,255,.14);
+  --blue:#6f9bff; --blue-ink:#071433; --blue-soft:rgba(111,155,255,.2);
+  --btn:#ffffff; --btn-ink:#0b1a45;
+  --paper:#6fa0ff; --handle:#ffa95c;
+  --good:#5fdc92; --good-bg:rgba(60,200,120,.16); --warn:#ffc266; --warn-bg:rgba(255,180,60,.15); --bad:#ff8c8c; --bad-bg:rgba(255,90,90,.16);
+  --shadow:0 1px 0 rgba(255,255,255,.1) inset,0 18px 40px -16px rgba(0,0,0,.55);
+  --shadow-hover:0 1px 0 rgba(255,255,255,.14) inset,0 28px 54px -18px rgba(0,0,0,.65),0 0 0 1px rgba(140,170,255,.28);
+  --font:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif; --head:'Manrope','Inter',system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 var(--font);-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:var(--head);margin:0;letter-spacing:-.01em;text-wrap:balance}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--blue);outline-offset:2px;border-radius:6px}
+.num{font-variant-numeric:tabular-nums}
+
+/* shell */
+.app{min-height:100vh;display:grid;grid-template-columns:1fr;background:radial-gradient(60% 40% at 78% 0%,rgba(80,120,230,.40),transparent 70%),radial-gradient(50% 40% at 0% 100%,rgba(60,90,200,.28),transparent 70%)}
+.side{display:none}
+main{min-width:0;padding-block:16px 96px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.top h1{font-size:clamp(22px,5vw,30px)}
+.top .sub{color:var(--muted);font-size:13px}
+.chip{display:inline-flex;align-items:center;gap:6px;border-radius:99px;padding:5px 11px;font-size:12px;font-weight:600;background:var(--surface-2);border:1px solid var(--line);color:var(--muted)}
+.chip.good{background:var(--good-bg);color:var(--good);border-color:transparent}
+.chip.warn{background:var(--warn-bg);color:var(--warn);border-color:transparent}
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:40;display:flex;overflow-x:auto;gap:2px;background:var(--navy);padding:6px max(6px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(6px,env(safe-area-inset-left,0px));box-shadow:0 -8px 24px rgba(0,0,0,.25)}
+.tabbar a{flex:1 0 66px;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 2px;color:var(--navy-ink);font-size:11px;font-weight:500;text-decoration:none;border-radius:10px}
+.tabbar a svg,.side a svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.tabbar a[aria-current="page"]{color:#fff;background:var(--navy-2)}
+@media(min-width:900px){
+  .app{grid-template-columns:252px 1fr}
+  .side{display:flex;flex-direction:column;gap:6px;position:sticky;top:0;height:100vh;background:linear-gradient(180deg,rgba(16,30,76,.78),rgba(7,13,34,.92));border-right:1px solid var(--line);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);color:var(--navy-ink);padding:22px 14px}
+  .brand{display:flex;gap:10px;align-items:center;padding:4px 8px 18px;color:#fff;font:700 17px/1.15 var(--head)}
+  .brand small{display:block;font:500 11px var(--font);color:var(--navy-ink);letter-spacing:.04em;margin-top:3px}
+  .side a{display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:12px;color:var(--navy-ink);text-decoration:none;font-weight:500;transition:background .2s,color .2s,transform .2s}
+  .side a:hover{background:var(--navy-2);color:#fff;transform:translateX(3px)}
+  .side a[aria-current="page"]{background:linear-gradient(135deg,#5b8cff,#3156d8);color:#fff;box-shadow:0 10px 22px -8px rgba(91,140,255,.75)}
+  .side .foot{margin-top:auto;border-top:1px solid var(--navy-line);padding:14px 8px 0;font-size:12px;line-height:1.5}
+  .tabbar{display:none}
+  main{padding-block:26px 40px;padding-left:max(28px,env(safe-area-inset-left,0px));padding-right:max(28px,env(safe-area-inset-right,0px))}
+}
+
+/* cards and 3D */
+.stage{perspective:1000px}
+.card{background:linear-gradient(160deg,rgba(255,255,255,.10),rgba(255,255,255,.04));border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);padding:18px;min-width:0;transition:box-shadow .25s,transform .25s}
+.tilt{transform-style:preserve-3d;transform:rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));will-change:transform}
+.tilt:hover{box-shadow:var(--shadow-hover)}
+.card h2{font-size:17px;margin-bottom:4px}
+.card .hint{color:var(--muted);font-size:13px;margin:0 0 14px}
+.grid{display:grid;gap:16px;min-width:0}
+.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media(min-width:1100px){.kpis{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.kpi{position:relative;overflow:hidden;padding:16px}
+.kpi::before{content:"";position:absolute;right:-26px;top:-26px;width:90px;height:90px;border-radius:50%;background:var(--kc,var(--blue));opacity:.13}
+.kpi .l{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.kpi .v{font:700 clamp(26px,5.4vw,36px)/1.1 var(--head);margin-top:8px}
+.kpi .v small{font-size:14px;font-weight:600;color:var(--muted);margin-left:4px}
+.kpi .s{font-size:12px;color:var(--muted);margin-top:4px}
+.two{grid-template-columns:1fr}
+@media(min-width:1100px){.two{grid-template-columns:minmax(0,1.6fr) minmax(0,1fr)}.two.even{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.banner{position:relative;border-radius:26px;overflow:hidden;min-height:150px;display:flex;align-items:center;margin-bottom:16px;border:1px solid var(--line);background:radial-gradient(80% 140% at 88% 0%,rgba(111,155,255,.5),transparent 62%),linear-gradient(120deg,#1c3274,#0e1a46 72%);box-shadow:var(--shadow)}
+.banner .in{position:relative;z-index:1;padding:22px;max-width:min(62%,560px)}
+.banner.big{min-height:260px}
+.banner h2{font-size:clamp(22px,5vw,30px);line-height:1.1;font-weight:800}
+.banner.big h2{font-size:clamp(34px,8.5vw,68px);line-height:1.02}
+.banner p{margin:10px 0 0;color:#c3d0ee;font-size:14px;max-width:44ch}
+.banner .scene{position:absolute;right:1%;bottom:-6%;width:clamp(130px,38%,380px);height:auto;max-width:none;pointer-events:none;animation:sway 6s ease-in-out infinite}
+.banner.big .scene{width:clamp(150px,46%,470px)}
+@keyframes sway{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.note{border-radius:12px;padding:10px 14px;font-size:13px;margin-bottom:14px;background:var(--warn-bg);color:var(--warn)}
+.note.good{background:var(--good-bg);color:var(--good)}
+
+/* buttons, forms */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:99px;padding:11px 20px;font-weight:700;cursor:pointer;background:var(--btn);color:var(--btn-ink);box-shadow:0 10px 24px -10px rgba(140,170,255,.8);transition:transform .15s,filter .15s;text-decoration:none;min-height:44px}
+.btn:hover{transform:translateY(-1px);filter:brightness(1.06)}
+.btn:active{transform:translateY(0)}
+.btn.ghost{background:var(--surface-2);color:var(--ink);border:1px solid var(--line);box-shadow:none}
+.btn.danger{background:#e5484d;color:#fff;box-shadow:none}
+.btn.sm{padding:7px 14px;min-height:36px;font-size:13px}
+.btn[disabled]{opacity:.5;cursor:not-allowed;transform:none}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+form .fields{display:grid;gap:14px;grid-template-columns:1fr}
+@media(min-width:640px){form .fields{grid-template-columns:1fr 1fr}.span2{grid-column:1/-1}}
+label.f{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600;min-width:0}
+.in-el{width:100%;min-height:46px;padding:10px 12px;border-radius:12px;border:1.5px solid var(--line);background:var(--surface-2);font-size:16px;font-weight:500}
+textarea.in-el{min-height:84px;resize:vertical}
+.in-el:focus{border-color:var(--blue);background:var(--surface-3)}
+select.in-el option{background:#10204f;color:#fff}
+.err{color:var(--bad);font-size:12.5px;font-weight:500;min-height:0}
+.in-el[aria-invalid="true"]{border-color:var(--bad)}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.seg label{position:relative;cursor:pointer}
+.seg input{position:absolute;opacity:0;inset:0}
+.seg span{display:flex;align-items:center;gap:10px;padding:12px;border:1.5px solid var(--line);border-radius:12px;background:var(--surface-2);font-weight:600;min-height:46px}
+.seg i{width:12px;height:12px;border-radius:4px;background:var(--c)}
+.seg input:checked+span{border-color:var(--blue);background:var(--blue-soft)}
+.seg input:focus-visible+span{outline:3px solid var(--blue);outline-offset:2px}
+.net{border-radius:16px;padding:16px;background:var(--surface-2);border:1.5px dashed var(--line);text-align:center}
+.net .v{font:700 40px/1.1 var(--head)}
+.net.ok{background:var(--good-bg);border-color:transparent;color:var(--good)}
+.net.bad{background:var(--bad-bg);border-color:transparent;color:var(--bad)}
+.net .t{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;opacity:.85}
+.roll{width:150px;height:140px;margin:0 auto;display:block;animation:bob 4s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0) rotateY(-8deg)}50%{transform:translateY(-6px) rotateY(8deg)}}
+
+/* tables, pills */
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:14px}
+table{border-collapse:collapse;width:100%;font-size:14px;min-width:560px}
+th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
+th{font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);background:var(--surface-2);position:sticky;top:0}
+tr:last-child td{border-bottom:0}
+td.r,th.r{text-align:right}
+td.wrap{white-space:normal;min-width:140px}
+.pill{display:inline-flex;align-items:center;gap:6px;border-radius:99px;padding:2px 10px;font-size:12px;font-weight:600;background:var(--surface-2);border:1px solid var(--line)}
+.pill i{width:8px;height:8px;border-radius:3px;background:var(--c)}
+.demo{font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--warn);background:var(--warn-bg);border-radius:6px;padding:1px 5px;margin-left:6px}
+.empty{text-align:center;padding:28px 12px;color:var(--muted)}
+.empty b{display:block;color:var(--ink);font:600 17px var(--head);margin-bottom:6px}
+
+/* charts */
+.chart{width:100%;height:auto;display:block}
+.chart text{fill:var(--muted);font:11px var(--font)}
+.chart .val{fill:var(--ink);font-weight:600}
+.chart .grid{stroke:var(--line)}
+.bar{transform-box:fill-box;transform-origin:bottom;animation:grow .7s cubic-bezier(.2,.8,.2,1) both}
+@keyframes grow{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;margin-top:8px}
+.legend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.hb{display:grid;grid-template-columns:minmax(80px,32%) 1fr auto;gap:10px;align-items:center;font-size:13.5px;padding:5px 0}
+.hb .lbl{overflow-wrap:anywhere}
+.hb .track{height:12px;border-radius:99px;background:var(--surface-2);overflow:hidden}
+.hb .track i{display:block;height:100%;border-radius:99px;background:var(--blue);animation:fill .8s cubic-bezier(.2,.8,.2,1) both;transform-origin:left}
+@keyframes fill{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.donutwrap{display:flex;gap:18px;align-items:center;flex-wrap:wrap;justify-content:center}
+.donut{width:170px;height:170px;flex:none}
+.donut circle{transition:stroke-dasharray .8s}
+.donut text{fill:var(--ink);font:700 18px var(--head);text-anchor:middle}
+.donut .s{fill:var(--muted);font:500 10px var(--font)}
+.lg div{display:flex;gap:8px;align-items:baseline;margin:4px 0;font-size:14px}
+.lg i{width:11px;height:11px;border-radius:3px;display:inline-block;flex:none;transform:translateY(1px)}
+details.dt{margin-top:12px}
+details.dt summary{cursor:pointer;font-weight:600;font-size:13px;color:var(--blue);min-height:32px}
+
+/* tabs, filters, modal, toast */
+.tabs{display:flex;gap:6px;flex-wrap:wrap;background:var(--surface-2);padding:5px;border-radius:14px;border:1px solid var(--line)}
+.tabs button{border:0;background:none;padding:9px 16px;border-radius:10px;font-weight:600;cursor:pointer;color:var(--muted);min-height:40px}
+.tabs button[aria-pressed="true"]{background:var(--surface-3);color:var(--ink)}
+.filters{display:grid;gap:10px;grid-template-columns:1fr 1fr;margin-bottom:12px}
+@media(min-width:900px){.filters{grid-template-columns:2fr 1fr 1fr 1fr 1fr}}
+.filters .wide{grid-column:1/-1}
+@media(min-width:900px){.filters .wide{grid-column:auto}}
+.modal{position:fixed;inset:0;z-index:100;display:grid;place-items:center;background:rgba(6,12,28,.6);padding:16px}
+.modal .box{background:var(--solid);border:1px solid var(--line);border-radius:18px;padding:22px;max-width:420px;width:100%;box-shadow:var(--shadow-hover)}
+.toast{position:fixed;left:50%;bottom:calc(86px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;background:var(--navy);color:#fff;padding:12px 18px;border-radius:14px;font-weight:500;z-index:120;max-width:calc(100vw - 32px);transition:.3s;box-shadow:0 14px 30px rgba(0,0,0,.35)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+@media(min-width:900px){.toast{bottom:28px}}
+.sn{display:flex;flex-direction:column;gap:6px}
+.fhero{position:relative;border-radius:26px;overflow:hidden;margin-bottom:16px;border:1px solid var(--line);background:linear-gradient(180deg,#1c3274,#0c1740);box-shadow:var(--shadow)}
+.fhead{position:relative;z-index:2;padding:20px 20px 0}
+.fhead h2{font-size:clamp(26px,6vw,46px);line-height:1.05;font-weight:800;color:#fff}
+.fhead p{margin:6px 0 0;color:#c3d0ee;font-size:14px}
+.roles{position:relative;z-index:2;display:grid;grid-template-columns:1fr;gap:10px;padding:14px 16px 4px}
+@media(min-width:760px){.roles{grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}}
+.rc{display:block;text-align:left;font:inherit;color:#0b1538;border:0;border-radius:18px;padding:12px 14px;cursor:pointer;text-decoration:none;background:linear-gradient(180deg,rgba(255,255,255,.96),rgba(225,234,255,.92));box-shadow:0 18px 30px -14px rgba(0,0,0,.55),inset 0 1px 0 #fff;animation:bob 7s ease-in-out infinite}
+.rc:nth-child(2){animation-delay:-2s}.rc:nth-child(3){animation-delay:-4s}
+.rc .rh{display:block;margin:-12px -14px 8px;padding:9px 14px;border-radius:18px 18px 0 0;color:#fff;font:800 17px var(--head)}
+.rc.admin .rh{background:linear-gradient(135deg,#22c55e,#15803d)}.rc.mission .rh{background:linear-gradient(135deg,#3b82f6,#1d4ed8)}.rc.pallet .rh{background:linear-gradient(135deg,#8b5cf6,#6d28d9)}
+.rc ul{list-style:none;margin:0;padding:0;font-size:13.5px;line-height:1.7;font-weight:600}
+.rc li::before{content:"\2713";margin-right:8px;font-weight:800}
+.rc.admin li::before{color:#16a34a}.rc.mission li::before{color:#2563eb}.rc.pallet li::before{color:#7c3aed}
+.rc .rgo{display:inline-block;margin-top:6px;font-size:12px;font-weight:700;color:#3156d8}
+.fscene{display:block;width:100%;height:auto;margin-top:-6px}
+.tiles{display:grid;gap:12px;grid-template-columns:repeat(2,minmax(0,1fr))}
+@media(min-width:1000px){.tiles{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.tile{border-radius:20px;padding:16px;color:#fff;box-shadow:0 20px 34px -16px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.35)}
+.tile .tl{font:700 13px var(--head);letter-spacing:.04em;opacity:.95}
+.tile .tv{font:800 clamp(24px,5.4vw,34px)/1.1 var(--head);margin-top:10px}
+.tile .tv small{font-size:14px;margin-left:5px;font-weight:700;opacity:.9}
+.t-blue{background:linear-gradient(145deg,#4f8dff,#1d4ed8)}.t-green{background:linear-gradient(145deg,#2fd07a,#15803d)}.t-orange{background:linear-gradient(145deg,#ffa23a,#e2630f)}.t-purple{background:linear-gradient(145deg,#9b6dff,#5b21b6)}
+.lite .fscene{display:none}.lite .rc,.lite .tile,.lite .scene,.lite .roll{animation:none!important}.lite .tilt{transform:none!important}.lite *{animation-duration:.01ms!important}
+
+.chk{display:grid;gap:16px;grid-template-columns:1fr;margin-top:16px}
+@media(min-width:1000px){.chk{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.stat{display:grid;grid-template-columns:1fr auto;gap:8px 12px;font-size:14px;margin-top:12px}
+.stat span{color:var(--muted)}
+.verdict{display:inline-flex;align-items:center;gap:8px;border-radius:99px;padding:7px 16px;font:800 15px var(--head);letter-spacing:.07em}
+.verdict.match{background:var(--good-bg);color:var(--good)}
+.verdict.mismatch{background:var(--bad-bg);color:var(--bad)}
+.verdict.none{background:var(--surface-2);color:var(--muted)}
+.prow{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 12px;border:1px solid var(--line);border-radius:12px;background:var(--surface-2);margin-top:8px}
+.who{color:var(--muted);font-size:12px}
+.enter{animation:enter .35s cubic-bezier(.2,.8,.2,1) both}
+@keyframes enter{from{opacity:0;transform:translateY(14px) scale(.99)}to{opacity:1;transform:none}}
+.ok-panel{display:flex;gap:14px;align-items:flex-start;background:var(--good-bg);color:var(--good);border-radius:14px;padding:14px;margin-bottom:14px}
+.ok-panel b{display:block;font-family:var(--head);font-size:16px}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.tilt{transform:none!important}}
+</style>
+
+<div class="app">
+  <aside class="side" aria-label="Main">
+    <div class="brand"><svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true"><rect x="5" y="9" width="24" height="21" rx="3" fill="#c9965a"/><path d="M5 9l3-5h18l3 5z" fill="#e2b47a"/><path d="M12 9c0-5 10-5 10 0" fill="none" stroke="#fff" stroke-width="2"/></svg><div>Paper Bag<br>Waste Monitor<small>PAPER BAG DEPARTMENT</small></div></div>
+    <nav class="sn" id="sidenav" aria-label="Sections"></nav>
+    <div class="foot" id="sidefoot"></div>
+  </aside>
+  <main>
+    <header class="top">
+      <div><h1 id="ptitle">Dashboard</h1><div class="sub" id="psub"></div></div>
+      <div class="row" id="chips"></div>
+    </header>
+    <div id="status"></div>
+    <div id="view" class="enter" aria-live="polite"></div>
+  </main>
+</div>
+<nav class="tabbar" id="tabnav" aria-label="Sections"></nav>
+<div id="modal" hidden></div>
+<div id="toast" class="toast" role="status"></div>
+<input type="file" id="restorefile" accept=".json,application/json" hidden>
+
+<script>
+(function(){
+'use strict';
+function cyl(xc,base,w,h){var rx=w/2,ry=Math.max(5,w*.17),y=base-h,x=xc-rx;
+  return '<path d="M'+x+' '+y+'v'+h+'a'+rx+' '+ry+' 0 0 0 '+w+' 0v'+(-h)+'z" fill="url(#gb)"/><ellipse cx="'+xc+'" cy="'+y+'" rx="'+rx+'" ry="'+ry+'" fill="url(#gt)"/><ellipse cx="'+xc+'" cy="'+y+'" rx="'+(rx*.38)+'" ry="'+(ry*.38)+'" fill="#274aa8"/>'}
+function cube(cx,cy,s){return '<polygon points="'+cx+','+cy+' '+(cx+s)+','+(cy+s/2)+' '+cx+','+(cy+s)+' '+(cx-s)+','+(cy+s/2)+'" fill="#d3e2ff"/><polygon points="'+(cx-s)+','+(cy+s/2)+' '+cx+','+(cy+s)+' '+cx+','+(cy+2*s)+' '+(cx-s)+','+(cy+1.5*s)+'" fill="#3558c4"/><polygon points="'+(cx+s)+','+(cy+s/2)+' '+cx+','+(cy+s)+' '+cx+','+(cy+2*s)+' '+(cx+s)+','+(cy+1.5*s)+'" fill="#5f8af2"/>'}
+function scene(){
+  return '<svg class="scene" viewBox="0 0 380 260" aria-hidden="true"><defs>'
+  +'<linearGradient id="gb" x1="0" x2="1"><stop offset="0" stop-color="#1a3a9c"/><stop offset=".45" stop-color="#86adff"/><stop offset="1" stop-color="#1b3797"/></linearGradient>'
+  +'<linearGradient id="gt" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#d6e4ff"/><stop offset="1" stop-color="#6f9aff"/></linearGradient>'
+  +'<linearGradient id="gp" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d3e3ff"/><stop offset=".5" stop-color="#4a6fd0"/><stop offset="1" stop-color="#1a2f78"/></linearGradient>'
+  +'<radialGradient id="gg"><stop offset="0" stop-color="#7ea8ff" stop-opacity=".5"/><stop offset="1" stop-color="#7ea8ff" stop-opacity="0"/></radialGradient></defs>'
+  +'<ellipse cx="190" cy="150" rx="190" ry="120" fill="url(#gg)"/>'
+  +'<ellipse cx="190" cy="222" rx="168" ry="38" fill="#0b1538"/><ellipse cx="190" cy="214" rx="168" ry="38" fill="url(#gp)"/><ellipse cx="190" cy="209" rx="150" ry="31" fill="#15245c"/><ellipse cx="190" cy="209" rx="150" ry="31" fill="none" stroke="#a8c1ff" stroke-opacity=".55" stroke-width="1.5"/>'
+  +cyl(130,184,46,92)+cyl(250,184,50,104)+cyl(190,190,64,134)
+  +cyl(92,206,40,50)+cyl(286,206,42,64)+cyl(160,212,34,36)+cyl(226,214,32,26)
+  +cube(52,48,16)+cube(334,78,12)+cube(300,22,9)
+  +'</svg>';
+}
+function bn(t,p,big){return '<div class="banner'+(big?' big':'')+'"><div class="in"><h2>'+t+'</h2><p>'+p+'</p></div>'+scene()+'</div>'}
+var TYPES=['Paper Waste','Handle Waste'];
+var REASONS=['Machine Setting Problem','Paper Damage','Handle Damage','Material Quality Problem','Cutting Problem','Printing Problem','Operator Error','Other','Unknown'];
+var TCOL={'Paper Waste':'var(--paper)','Handle Waste':'var(--handle)'};
+
+/* ---------- helpers ---------- */
+function $(s,r){return (r||document).querySelector(s)}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function p2(n){return String(n).padStart(2,'0')}
+function dstr(d){return d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate())}
+function today(){return dstr(new Date())}
+function nowT(){var d=new Date();return p2(d.getHours())+':'+p2(d.getMinutes())}
+function parseD(s){var a=s.split('-').map(Number);return new Date(a[0],a[1]-1,a[2])}
+function n2(v){return Number(v).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}
+function short(d){return d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}
+function uid(){return 'r'+Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
+function sum(a,k){var t=0;for(var i=0;i<a.length;i++)t+=Number(a[i][k])||0;return Math.round(t*1000)/1000}
+function toast(m){var t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(toast.h);toast.h=setTimeout(function(){t.classList.remove('show')},3200)}
+
+/* ---------- roles, shifts, settings ---------- */
+var SHIFTS=['Day Shift','Night Shift'];
+var ROLE_LABEL={admin:'Admin',mission:'Mission Waste Staff',pallet:'Pallet Staff',none:'No role'};
+var IC={home:'<path d="M4 11l8-7 8 7v9H4z"/><path d="M10 20v-6h4v6"/>',plus:'<circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/>',pallet:'<path d="M3 17h18M5 17v3M12 17v3M19 17v3"/><rect x="5" y="9" width="14" height="8" rx="1"/>',check:'<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M9 12l2 2 4-4"/>',chart:'<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',db:'<ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/>',dl:'<path d="M12 3v12M7 10l5 5 5-5M4 20h16"/>',gear:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/>'};
+var NAV={
+  admin:[['dashboard','Dashboard',IC.home,'Home'],['add-record','Add Waste Record',IC.plus,'Waste'],['add-pallet','Add Pallet Record',IC.pallet,'Pallet'],['shift-check','Shift Check',IC.check,'Check'],['reports','Reports',IC.chart,'Reports'],['database','Database',IC.db,'Data'],['backup','Backup & Export',IC.dl,'Backup'],['settings','Settings',IC.gear,'Settings']],
+  mission:[['add-record','Mission Waste Record',IC.plus,'Add'],['database','View Records',IC.db,'Records']],
+  pallet:[['add-pallet','Pallet Record',IC.pallet,'Add'],['database','View Pallets',IC.db,'Pallets']],
+  none:[]};
+function blankCfg(){return {shifts:{day:{start:'',end:''},night:{start:'',end:''}},roles:{}}}
+function mergeCfg(d){
+  var c=blankCfg();if(!d)return c;
+  ['day','night'].forEach(function(k){var s=d.shifts&&d.shifts[k];if(s&&/^\d{2}:\d{2}$/.test(s.start||'')&&/^\d{2}:\d{2}$/.test(s.end||''))c.shifts[k]={start:s.start,end:s.end}});
+  if(d.roles&&typeof d.roles==='object')Object.keys(d.roles).forEach(function(u){var v=d.roles[u];if(v==='mission'||v==='pallet'||v==='none')c.roles[u]=v});
+  return c;
+}
+function nul(){return null}
+function tmin(s){if(!/^\d{2}:\d{2}$/.test(s||''))return null;return parseInt(s.slice(0,2),10)*60+parseInt(s.slice(3),10)}
+function shiftCfg(sh){return Store.cfg.shifts[sh==='Day Shift'?'day':'night']}
+function shiftsSet(){var s=Store.cfg.shifts;return ['day','night'].every(function(k){return tmin(s[k].start)!=null&&tmin(s[k].end)!=null})}
+function inWin(t,a,b){return a<b?(t>=a&&t<b):(t>=a||t<b)}
+function suggestShift(time){
+  if(!shiftsSet())return '';var t=tmin(time);if(t==null)return '';
+  var d=Store.cfg.shifts.day,n=Store.cfg.shifts.night;
+  if(inWin(t,tmin(d.start),tmin(d.end)))return 'Day Shift';
+  if(inWin(t,tmin(n.start),tmin(n.end)))return 'Night Shift';
+  return '';
+}
+/* the date a shift belongs to is the date it STARTED, so the after-midnight part of a night shift keeps yesterday's date */
+function shiftDate(calDate,time,shift){
+  if(!shiftsSet()||!shift)return calDate;
+  var t=tmin(time),c=shiftCfg(shift),a=tmin(c.start),b=tmin(c.end);
+  if(t==null)return calDate;
+  if(a>b&&t<b){var d=parseD(calDate);d.setDate(d.getDate()-1);return dstr(d)}
+  return calDate;
+}
+function shiftWindow(date,shift){
+  if(!shiftsSet())return null;
+  var c=shiftCfg(shift),a=tmin(c.start),b=tmin(c.end),d=parseD(date);
+  var s=new Date(d.getFullYear(),d.getMonth(),d.getDate(),0,a),e=new Date(d.getFullYear(),d.getMonth(),d.getDate(),0,b);
+  if(b<=a)e.setDate(e.getDate()+1);
+  return {start:s,end:e};
+}
+function shiftStatus(date,shift){
+  var w=shiftWindow(date,shift);if(!w)return {k:'unset',t:'Shift times not set'};
+  var n=new Date();if(n>=w.end)return {k:'done',t:'Completed'};if(n<w.start)return {k:'wait',t:'Not started'};return {k:'live',t:'In progress'};
+}
+function autoObj(o){
+  if(!o.shiftTouched){var s=suggestShift(o.time);if(s)o.shift=s}
+  if(!o.dateTouched)o.date=shiftDate(today(),o.time,o.shift||'');
+}
+function myRole(){if(Store.role.admin)return S.preview||'admin';return Store.role.key}
+function adm(){return Store.role.admin&&!S.preview}
+
+/* ---------- validation (also used on restore) ---------- */
+function validate(r){
+  var e={};
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(r.date||''))e.date='Choose a date.';
+  if(!/^\d{2}:\d{2}$/.test(r.time||''))e.time='Choose a time.';
+  if(!String(r.mission_name||'').trim())e.mission_name='Mission name is required, for example 5 QT.';
+  if(TYPES.indexOf(r.waste_type)<0)e.waste_type='Choose Paper Waste or Handle Waste.';
+  var g=r.gross_weight,t=r.trolley_weight;
+  if(!isFinite(g)||g<=0)e.gross_weight='Enter the gross weight in KG, more than 0.';
+  if(!isFinite(t)||t<0)e.trolley_weight='Enter the empty trolley weight in KG, 0 or more.';
+  if(!e.gross_weight&&!e.trolley_weight&&g<t)e.gross_weight='Gross weight cannot be less than the trolley weight.';
+  if(REASONS.indexOf(r.waste_reason)<0)e.waste_reason='Choose a waste reason.';
+  if(r.shift&&SHIFTS.indexOf(r.shift)<0)e.shift='Choose Day Shift or Night Shift.';
+  return e;
+}
+function net(g,t){return Math.round((g-t)*1000)/1000}
+function clean(r){
+  var g=Number(r.gross_weight),t=Number(r.trolley_weight);
+  var o={id:String(r.id||uid()),date:r.date,time:r.time,mission_name:String(r.mission_name).trim().slice(0,60),waste_type:r.waste_type,
+    gross_weight:g,trolley_weight:t,net_waste:net(g,t),waste_reason:r.waste_reason,notes:String(r.notes||'').slice(0,500)};
+  if(r.shift)o.shift=r.shift;
+  if(r.given_by)o.given_by=String(r.given_by).trim().slice(0,60);
+  if(r.demo)o.demo=true;
+  return o;
+}
+function validatePallet(r){
+  var e={};
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(r.date||''))e.date='Choose a date.';
+  if(!/^\d{2}:\d{2}$/.test(r.time||''))e.time='Choose a time.';
+  if(SHIFTS.indexOf(r.shift)<0)e.shift='Choose Day Shift or Night Shift.';
+  if(!isFinite(r.weight)||r.weight<=0)e.weight='Enter the pallet weight in KG, more than 0.';
+  return e;
+}
+function cleanPallet(r){
+  var o={id:String(r.id||uid()),date:r.date,shift:r.shift,pallet_no:Number(r.pallet_no)||0,weight:Math.round(Number(r.weight)*1000)/1000,time:r.time};
+  if(r.collected_by)o.collected_by=String(r.collected_by).trim().slice(0,60);
+  if(r.demo)o.demo=true;
+  return o;
+}
+function who(){return Store.mode==='cloud'?(Store.me.id||''):'local'}
+
+/* ---------- store: shared database when available, otherwise this device ---------- */
+var Store={mode:'local',records:[],pallets:[],cfg:blankCfg(),ready:false,roleReady:false,slow:false,subs:[],chain:Promise.resolve(),cols:{},cfgRef:null,me:{id:null},role:{admin:true,write:true,key:'admin'},
+  on:function(f){this.subs.push(f)},
+  emit:function(){for(var i=0;i<this.subs.length;i++)this.subs[i]()},
+  setList:function(kind,a){a.sort(function(x,y){return (y.date+(y.time||'')).localeCompare(x.date+(x.time||''))});this[kind]=a;this.ready=true;this.emit()},
+  loadLocal:function(){
+    var self=this;
+    ['records','pallets'].forEach(function(k){var a=[];try{a=JSON.parse(localStorage.getItem('pbwm_'+k)||'[]')}catch(e){}self.setList(k,Array.isArray(a)?a:[])});
+    var c=null;try{c=JSON.parse(localStorage.getItem('pbwm_cfg')||'null')}catch(e){}
+    this.cfg=mergeCfg(c);
+  },
+  saveLocal:function(kind){try{localStorage.setItem('pbwm_'+kind,JSON.stringify(this[kind]))}catch(e){}},
+  resolveRole:function(){
+    if(this.role.admin){this.role.key='admin';return}
+    var k=this.cfg.roles[this.me.id];this.role.key=(k==='mission'||k==='pallet')?k:'none';
+  },
+  init:function(){
+    var self=this;
+    var go=function(){self.mode='local';self.role={admin:true,write:true,key:'admin'};self.loadLocal();self.roleReady=true;self.emit()};
+    if(!(window.claude&&claude.use)){go();return Promise.resolve()}
+    return Promise.all([claude.use('db').catch(nul),claude.use('user').catch(nul)]).then(function(res){
+      var db=res[0],user=res[1];
+      if(!db){go();return}
+      return Promise.all([user&&user.canEdit?user.canEdit():false,user&&user.can?user.can('data.write'):null,user&&user.id?user.id():null]).then(function(p){
+        var admin=p[0]===true;self.me.id=p[2];
+        self.role={admin:admin,write:p[1]!==false,key:admin?'admin':'none'};
+        self.mode='cloud';
+        self.cols.records=db.collection('records');self.cols.pallets=db.collection('pallets');self.cfgRef=db.doc('settings/config');
+        var timer=setTimeout(function(){self.slow=true;self.emit()},10000);
+        var sub=function(kind){self.cols[kind].onSnapshot(function(snap){
+          if(!snap.metadata.fromCache){clearTimeout(timer);self.slow=false}
+          self.setList(kind,snap.docs.map(function(d){var o=Object.assign({},d.data());o.id=d.id;return o}));
+        },function(){clearTimeout(timer);self.slow=true;self.emit()})};
+        sub('records');sub('pallets');
+        self.cfgRef.onSnapshot(function(s){self.cfg=mergeCfg(s.exists?s.data():null);self.resolveRole();self.roleReady=true;self.emit()},function(){self.roleReady=true;self.emit()});
+        setTimeout(function(){if(!self.roleReady){self.roleReady=true;self.emit()}},8000);
+      });
+    }).catch(go);
+  },
+  put:function(rec,isNew,kind){
+    kind=kind||'records';var pre=kind==='pallets'?'P':'';var self=this;
+    var write=function(){
+      if(self.mode==='cloud')return self.cols[kind].doc(rec.id).set(rec).then(function(){return rec});
+      var arr=self[kind],i=arr.findIndex(function(x){return x.id===rec.id});
+      if(i>=0)arr[i]=rec;else arr.push(rec);
+      self.setList(kind,arr.slice());self.saveLocal(kind);return Promise.resolve(rec);
+    };
+    var job=function(){
+      if(!isNew)return write();
+      // new records get the next number followed by A: 1A, 2A, 3A (pallets: P1A, P2A ...)
+      var re=new RegExp('^'+pre+'(\\d+)A$'),mx=0;
+      self[kind].forEach(function(x){var m=re.exec(x.id);if(m)mx=Math.max(mx,parseInt(m[1],10))});
+      var n=mx+1;
+      var pick=function(){rec.id=pre+n+'A';if(self.mode!=='cloud')return Promise.resolve();return self.cols[kind].doc(rec.id).get().then(function(s){if(s.exists){n++;return pick()}})};
+      return pick().then(write);
+    };
+    this.chain=this.chain.then(job,job);return this.chain;
+  },
+  del:function(id,kind){
+    kind=kind||'records';var self=this;
+    var job=function(){
+      if(self.mode==='cloud')return self.cols[kind].doc(id).delete();
+      self.setList(kind,self[kind].filter(function(x){return x.id!==id}));self.saveLocal(kind);return Promise.resolve();
+    };
+    this.chain=this.chain.then(job,job);return this.chain;
+  },
+  saveCfg:function(){
+    var self=this;
+    var job=function(){
+      if(self.mode==='cloud')return self.cfgRef.set(self.cfg);
+      try{localStorage.setItem('pbwm_cfg',JSON.stringify(self.cfg))}catch(e){}
+      self.emit();return Promise.resolve();
+    };
+    this.chain=this.chain.then(job,job);return this.chain;
+  }
+};
+
+/* ---------- state ---------- */
+var S={route:'dashboard',editing:null,saved:null,preview:null,dbkind:'records',chkDate:today(),
+  rep:{kind:'daily',anchor:today()},
+  db:{q:'',from:'',to:'',type:'',shift:'',sort:'new',limit:50},
+  form:{date:today(),time:nowT(),mission:'',type:'Paper Waste',reason:'Unknown',shift:'',shiftTouched:false,dateTouched:false},
+  pal:{by:'',date:today(),time:nowT(),shift:'',shiftTouched:false,dateTouched:false,w:'',list:[]},palSaved:null};
+
+/* ---------- charts ---------- */
+function nice(m){if(m<=0)return 10;var e=Math.pow(10,Math.floor(Math.log10(m))),f=m/e;return (f<=1?1:f<=2?2:f<=5?5:10)*e}
+function tick(v){return Number(v).toLocaleString('en-US',{maximumFractionDigits:1})}
+function stacked(b,title){
+  var W=640,H=260,L=46,R=10,T=18,B=36,pw=W-L-R,ph=H-T-B,n=b.length;
+  var mx=nice(Math.max.apply(null,b.map(function(x){return x.a+x.b}).concat([1])));
+  var s='<svg class="chart" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="'+esc(title)+'">';
+  for(var i=0;i<=4;i++){var y=T+ph-ph*i/4;s+='<line class="grid" x1="'+L+'" x2="'+(W-R)+'" y1="'+y+'" y2="'+y+'"/><text x="'+(L-6)+'" y="'+(y+4)+'" text-anchor="end">'+tick(mx*i/4)+'</text>'}
+  var slot=pw/n,bw=Math.min(46,slot*.64),every=n>16?Math.ceil(n/12):1;
+  b.forEach(function(x,i){
+    var cx=L+slot*i+slot/2,ha=ph*x.a/mx,hb=ph*x.b/mx,ya=T+ph-ha,yb=ya-hb;
+    s+='<g><title>'+esc(x.label)+': Paper '+n2(x.a)+' kg, Handle '+n2(x.b)+' kg</title>';
+    if(x.a>0)s+='<rect class="bar" style="animation-delay:'+(i*35)+'ms" x="'+(cx-bw/2)+'" y="'+ya+'" width="'+bw+'" height="'+ha+'" rx="3" fill="var(--paper)"/>';
+    if(x.b>0)s+='<rect class="bar" style="animation-delay:'+(i*35)+'ms" x="'+(cx-bw/2)+'" y="'+yb+'" width="'+bw+'" height="'+hb+'" rx="3" fill="var(--handle)"/>';
+    if(n<=9&&x.a+x.b>0)s+='<text class="val" x="'+cx+'" y="'+(yb-5)+'" text-anchor="middle">'+n2(x.a+x.b)+'</text>';
+    if(i%every===0)s+='<text x="'+cx+'" y="'+(H-14)+'" text-anchor="middle">'+esc(x.label)+'</text>';
+    s+='</g>';
+  });
+  return s+'</svg><div class="legend"><span><i style="background:var(--paper)"></i>Paper Waste</span><span><i style="background:var(--handle)"></i>Handle Waste</span><span style="color:var(--muted)">KG</span></div>';
+}
+function hbars(items,color){
+  if(!items.length)return '<div class="empty">No data in this period.</div>';
+  var mx=Math.max.apply(null,items.map(function(i){return i.v}));
+  return items.map(function(i,k){return '<div class="hb"><span class="lbl">'+esc(i.l)+'</span><span class="track"><i style="width:'+Math.max(2,i.v/mx*100)+'%;background:'+(color||'var(--blue)')+';animation-delay:'+(k*60)+'ms"></i></span><b class="num">'+n2(i.v)+' kg</b></div>'}).join('');
+}
+function donut(p,h){
+  var t=p+h,C=2*Math.PI*44,pa=t?p/t*C:0,ha=t?h/t*C:0;
+  var s='<div class="donutwrap"><svg class="donut" viewBox="0 0 120 120" role="img" aria-label="Paper waste '+n2(p)+' kg, handle waste '+n2(h)+' kg"><circle cx="60" cy="60" r="44" fill="none" stroke="var(--surface-2)" stroke-width="16"/>';
+  if(t){s+='<circle cx="60" cy="60" r="44" fill="none" stroke="var(--paper)" stroke-width="16" stroke-dasharray="'+pa+' '+(C-pa)+'" transform="rotate(-90 60 60)"/>';
+    s+='<circle cx="60" cy="60" r="44" fill="none" stroke="var(--handle)" stroke-width="16" stroke-dasharray="'+ha+' '+(C-ha)+'" stroke-dashoffset="'+(-pa)+'" transform="rotate(-90 60 60)"/>'}
+  s+='<text x="60" y="61">'+n2(t)+'</text><text class="s" x="60" y="75">KG total</text></svg><div class="lg">';
+  s+='<div><i style="background:var(--paper)"></i><span>Paper Waste<br><b class="num">'+n2(p)+' kg'+(t?' · '+Math.round(p/t*100)+'%':'')+'</b></span></div>';
+  s+='<div><i style="background:var(--handle)"></i><span>Handle Waste<br><b class="num">'+n2(h)+' kg'+(t?' · '+Math.round(h/t*100)+'%':'')+'</b></span></div></div></div>';
+  return s;
+}
+function pill(t){return '<span class="pill" style="--c:'+TCOL[t]+'"><i></i>'+esc(t)+'</span>'}
+function demoTag(r){return r.demo?'<span class="demo">DEMO</span>':''}
+function shiftTag(s){return s?esc(s):'<span style="color:var(--warn)">No shift</span>'}
+function byCell(r){return '<span class="who" data-uid="'+esc(r.entered_by||'')+'"></span>'}
+function rowsTable(a,opts){
+  opts=opts||{};
+  if(!a.length)return '<div class="empty"><b>No entries</b>Nothing recorded for this selection.</div>';
+  var h='<div class="tw"><table><thead><tr><th>ID</th><th>Date</th><th>Shift</th><th>Time</th><th>Mission</th><th>Type</th><th class="r">Gross kg</th><th class="r">Trolley kg</th><th class="r">Net kg</th><th>Reason</th><th>Waste given by</th>'+(opts.actions?'<th>Actions</th>':'')+'</tr></thead><tbody>';
+  a.forEach(function(r){
+    h+='<tr><td class="num"><b>'+esc(r.id)+'</b></td><td class="num">'+esc(r.date)+'</td><td>'+shiftTag(r.shift)+'</td><td class="num">'+esc(r.time)+'</td><td>'+esc(r.mission_name)+demoTag(r)+'</td><td>'+pill(r.waste_type)+'</td><td class="r num">'+n2(r.gross_weight)+'</td><td class="r num">'+n2(r.trolley_weight)+'</td><td class="r num"><b>'+n2(r.net_waste)+'</b></td><td class="wrap">'+esc(r.waste_reason)+(r.notes?'<div style="color:var(--muted);font-size:12px">'+esc(r.notes)+'</div>':'')+'</td><td>'+(r.given_by?esc(r.given_by):'<span class="who">—</span>')+'</td>';
+    if(opts.actions)h+='<td><button class="btn ghost sm" data-act="edit" data-id="'+esc(r.id)+'">Edit</button> <button class="btn ghost sm" data-act="del" data-kind="records" data-id="'+esc(r.id)+'">Delete</button></td>';
+    h+='</tr>';
+  });
+  return h+'</tbody></table></div>';
+}
+function palTable(a,opts){
+  opts=opts||{};
+  if(!a.length)return '<div class="empty"><b>No pallets</b>Nothing recorded for this selection.</div>';
+  var h='<div class="tw"><table style="min-width:600px"><thead><tr><th>ID</th><th>Date</th><th>Shift</th><th class="r">Pallet no.</th><th class="r">Weight kg</th><th>Time</th><th>Collected by</th>'+(opts.actions?'<th>Actions</th>':'')+'</tr></thead><tbody>';
+  a.forEach(function(r){
+    h+='<tr><td class="num"><b>'+esc(r.id)+'</b>'+demoTag(r)+'</td><td class="num">'+esc(r.date)+'</td><td>'+shiftTag(r.shift)+'</td><td class="r num">'+esc(r.pallet_no)+'</td><td class="r num"><b>'+n2(r.weight)+'</b></td><td class="num">'+esc(r.time)+'</td><td>'+(r.collected_by?esc(r.collected_by):'<span class="who">—</span>')+'</td>';
+    if(opts.actions)h+='<td><button class="btn ghost sm" data-act="edit-pallet" data-id="'+esc(r.id)+'">Edit</button> <button class="btn ghost sm" data-act="del" data-kind="pallets" data-id="'+esc(r.id)+'">Delete</button></td>';
+    h+='</tr>';
+  });
+  return h+'</tbody></table></div>';
+}
+function fillNames(){
+  var els=document.querySelectorAll('[data-uid]');if(!els.length)return;
+  var ids=[];
+  els.forEach(function(e){var u=e.getAttribute('data-uid');if(u&&u!=='local'&&ids.indexOf(u)<0)ids.push(u);e.textContent=!u?'—':(u==='local'?'This device':'…')});
+  if(!ids.length||!(window.claude&&claude.use))return;
+  claude.use('user').then(function(user){
+    if(!user)return;
+    return user.profiles(ids).then(function(ps){els.forEach(function(e){var u=e.getAttribute('data-uid');if(ps[u]&&u!=='local')e.textContent=ps[u].name||'Someone'})});
+  }).catch(function(){});
+}
+function emptyAll(){
+  var r=myRole(),btn='';
+  if(r==='admin')btn='<a class="btn" href="#add-record">Add waste record</a>'+(adm()?'<button class="btn ghost" data-act="demo-load">Load demo data</button>':'');
+  else if(r==='mission'&&Store.role.write)btn='<a class="btn" href="#add-record">Add waste record</a>';
+  else if(r==='pallet'&&Store.role.write)btn='<a class="btn" href="#add-pallet">Add pallet record</a>';
+  return '<div class="card empty"><b>No records yet</b>Nothing has been recorded yet.'+(r==='admin'?' Add the first record from the factory floor, or load labelled demo data to see how the pages work.':'')+'<div class="row" style="justify-content:center;margin-top:14px">'+btn+'</div></div>';
+}
+
+/* ---------- grouping ---------- */
+function groupBy(a,key){var m={};a.forEach(function(r){m[r[key]]=(m[r[key]]||0)+(Number(r.net_waste)||0)});return Object.keys(m).map(function(k){return {l:k,v:Math.round(m[k]*1000)/1000}}).sort(function(x,y){return y.v-x.v})}
+function split(a){return {p:sum(a.filter(function(r){return r.waste_type==='Paper Waste'}),'net_waste'),h:sum(a.filter(function(r){return r.waste_type==='Handle Waste'}),'net_waste')}}
+function days(from,n){var o=[],d=parseD(from);for(var i=0;i<n;i++){o.push(dstr(d));d.setDate(d.getDate()+1)}return o}
+
+/* ---------- views ---------- */
+/* ---------- factory hero (SVG + CSS, no 3D library) ---------- */
+function bale(x,y,w,h,d){
+  var s='<g>'
+  +'<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" fill="url(#bl)"/>'
+  +'<polygon points="'+x+','+y+' '+(x+d)+','+(y-d*.6)+' '+(x+w+d)+','+(y-d*.6)+' '+(x+w)+','+y+'" fill="#d9b985"/>'
+  +'<polygon points="'+(x+w)+','+y+' '+(x+w+d)+','+(y-d*.6)+' '+(x+w+d)+','+(y+h-d*.6)+' '+(x+w)+','+(y+h)+'" fill="#8e6c43"/>';
+  for(var i=1;i<4;i++)s+='<line x1="'+x+'" y1="'+(y+h*i/4)+'" x2="'+(x+w)+'" y2="'+(y+h*i/4)+'" stroke="#6b4e2c" stroke-opacity=".35" stroke-width="2"/>';
+  s+='<rect x="'+(x+w*.28)+'" y="'+y+'" width="4" height="'+h+'" fill="#2a3a55" opacity=".8"/><rect x="'+(x+w*.7)+'" y="'+y+'" width="4" height="'+h+'" fill="#2a3a55" opacity=".8"/>';
+  return s+'</g>';
+}
+function palletSvg(x,y,w){
+  var s='<rect x="'+x+'" y="'+(y-6)+'" width="'+w+'" height="8" fill="#c79a5d"/><rect x="'+x+'" y="'+(y+8)+'" width="'+w+'" height="6" fill="#a97d45"/>';
+  [0,.46,.92].forEach(function(f){s+='<rect x="'+(x+w*f)+'" y="'+(y+2)+'" width="'+(w*.08)+'" height="8" fill="#8a6234"/>'});
+  return s;
+}
+function factorySvg(){
+  var s='<svg class="fscene" viewBox="0 0 900 330" role="img" aria-label="Illustration of a paper bag factory floor with a hydraulic baling machine, paper waste bales on pallets and a forklift">'
+  +'<defs><linearGradient id="wl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1c3274"/><stop offset="1" stop-color="#0c1740"/></linearGradient>'
+  +'<linearGradient id="fl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1a2a5e"/><stop offset="1" stop-color="#0a1233"/></linearGradient>'
+  +'<linearGradient id="win" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#dff0ff" stop-opacity=".95"/><stop offset="1" stop-color="#7fb0ff" stop-opacity=".55"/></linearGradient>'
+  +'<linearGradient id="mb" x1="0" x2="1"><stop offset="0" stop-color="#1a3a9c"/><stop offset=".4" stop-color="#5b8cff"/><stop offset="1" stop-color="#1a3490"/></linearGradient>'
+  +'<linearGradient id="st" x1="0" x2="1"><stop offset="0" stop-color="#8fa0c4"/><stop offset=".5" stop-color="#e3eaff"/><stop offset="1" stop-color="#7388b3"/></linearGradient>'
+  +'<linearGradient id="bl" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c9a574"/><stop offset="1" stop-color="#9c7a4d"/></linearGradient>'
+  +'<linearGradient id="fk" x1="0" x2="1"><stop offset="0" stop-color="#f3b13e"/><stop offset="1" stop-color="#c47f12"/></linearGradient></defs>'
+  +'<rect width="900" height="330" fill="url(#wl)"/>';
+  [60,230,400,570,740].forEach(function(x){s+='<rect x="'+x+'" y="26" width="100" height="120" rx="6" fill="url(#win)"/><path d="M'+(x+50)+' 26v120M'+x+' 86h100" stroke="#0e1a46" stroke-width="4"/>'});
+  s+='<polygon points="0,236 900,236 900,330 0,330" fill="url(#fl)"/><g stroke="#5b8cff" stroke-opacity=".18"><path d="M0 262h900M0 292h900M150 236L40 330M450 236v94M750 236l110 94"/></g>'
+  // sign
+  +'<g><rect x="660" y="40" width="210" height="62" rx="6" fill="#a3763f" stroke="#6b4a24" stroke-width="3" transform="rotate(-3 765 71)"/><text x="765" y="66" text-anchor="middle" font-family="Manrope,Arial,sans-serif" font-weight="800" font-size="19" fill="#2a1a08" transform="rotate(-3 765 71)">Track • Verify • Report</text><text x="765" y="90" text-anchor="middle" font-family="Manrope,Arial,sans-serif" font-weight="700" font-size="13" fill="#2a1a08" transform="rotate(-3 765 71)">All in One System</text></g>'
+  // machine
+  +'<ellipse cx="560" cy="300" rx="150" ry="20" fill="#000" opacity=".4"/>'
+  +'<rect x="450" y="262" width="220" height="30" rx="5" fill="url(#st)"/>'
+  +'<rect x="462" y="96" width="26" height="170" rx="4" fill="url(#mb)"/><rect x="632" y="96" width="26" height="170" rx="4" fill="url(#mb)"/>'
+  +'<rect x="450" y="76" width="220" height="40" rx="8" fill="url(#mb)"/><rect x="450" y="76" width="220" height="8" rx="4" fill="#9bbcff" opacity=".7"/>'
+  +'<rect x="520" y="116" width="80" height="46" rx="8" fill="url(#st)"/><rect x="552" y="162" width="16" height="44" fill="url(#st)"/>'
+  +'<rect x="500" y="204" width="120" height="16" rx="3" fill="#6b7fae"/>'
+  +'<rect x="500" y="220" width="120" height="44" fill="#0e1a46"/>'+bale(504,224,100,36,12)
+  +'<circle cx="640" cy="64" r="11" fill="#fff"/><circle cx="640" cy="64" r="8" fill="#16a34a"/><rect x="470" y="50" width="62" height="18" rx="4" fill="#0b1538"/><circle cx="482" cy="59" r="4" fill="#22c55e"/><circle cx="496" cy="59" r="4" fill="#f59e0b"/><circle cx="510" cy="59" r="4" fill="#ef4444"/>'
+  // pallets + bales foreground
+  +'<ellipse cx="760" cy="304" rx="110" ry="14" fill="#000" opacity=".35"/>'+palletSvg(690,288,150)+bale(700,236,130,48,22)
+  +'<ellipse cx="330" cy="306" rx="90" ry="12" fill="#000" opacity=".35"/>'+palletSvg(262,290,130)+bale(272,242,108,44,20)
+  // forklift
+  +'<ellipse cx="130" cy="310" rx="100" ry="12" fill="#000" opacity=".35"/>'
+  +'<rect x="40" y="130" width="12" height="170" fill="#9fb0d6"/><rect x="62" y="130" width="8" height="170" fill="#7388b3"/><rect x="40" y="290" width="70" height="8" fill="#9fb0d6"/>'
+  +palletSvg(42,274,66)+'<rect x="44" y="238" width="62" height="32" fill="url(#bl)"/>'
+  +'<rect x="110" y="236" width="110" height="54" rx="10" fill="url(#fk)"/><rect x="150" y="174" width="8" height="64" fill="#2a3a55"/><rect x="196" y="174" width="8" height="64" fill="#2a3a55"/><rect x="148" y="170" width="62" height="8" rx="3" fill="#2a3a55"/>'
+  +'<rect x="160" y="204" width="28" height="32" rx="6" fill="#0e1a46"/><circle cx="145" cy="294" r="20" fill="#111827"/><circle cx="145" cy="294" r="8" fill="#9ca3af"/><circle cx="200" cy="296" r="15" fill="#111827"/><circle cx="200" cy="296" r="6" fill="#9ca3af"/>'
+  +'</svg>';
+  return s;
+}
+function roleCard(k){
+  var C={admin:['Admin','Full Access','Manage Users and Shift Times','All Records, Reports and Settings'],mission:['Mission Staff','Add Mission Waste','View Mission Records','Only Mission Section'],pallet:['Pallet Staff','Add Pallet Weights','View Pallet Records','Only Pallet Section']}[k];
+  var inner='<span class="rh">'+C[0]+'</span><ul>'+C.slice(1).map(function(x){return '<li>'+x+'</li>'}).join('')+'</ul>'+(k==='admin'?'<span class="rgo">Open Settings</span>':'<span class="rgo">Preview this view</span>');
+  return k==='admin'?'<a class="rc admin tilt" href="#settings">'+inner+'</a>':'<button type="button" class="rc '+k+' tilt" data-act="preview" data-k="'+k+'">'+inner+'</button>';
+}
+function hero(){
+  return '<div class="fhero stage"><div class="fhead"><div><h2>Weigh. Record. Reduce.</h2><p>'+short(new Date())+' · Paper Bag Department</p></div></div><div class="roles">'+roleCard('mission')+roleCard('admin')+roleCard('pallet')+'</div>'+factorySvg()+'</div>';
+}
+function tile(c,l,v,u,ic){return '<div class="tile '+c+' tilt"><div class="tl">'+l+'</div><div class="tv num">'+v+(u?'<small>'+u+'</small>':'')+'</div></div>'}
+function shiftBars(day,ng){
+  var d=[['Day Shift',day],['Night Shift',ng]],mx=nice(Math.max(day.mt,day.pt,ng.mt,ng.pt,1)),W=360,H=210,L=40,B=34,T=18,ch=H-B-T;
+  var s='<svg viewBox="0 0 '+W+' '+H+'" class="chart" role="img" aria-label="Mission waste and pallet weight for Day and Night shift"><title>Shift wise report</title>';
+  for(var i=0;i<=4;i++){var y=T+ch*(1-i/4);s+='<line x1="'+L+'" x2="'+(W-8)+'" y1="'+y+'" y2="'+y+'" stroke="var(--line)"/><text x="'+(L-6)+'" y="'+(y+4)+'" text-anchor="end" font-size="10" fill="var(--muted)">'+tick(mx*i/4)+'</text>'}
+  d.forEach(function(x,i){
+    var gx=L+30+i*150;
+    [[x[1].mt,'#3b82f6',0],[x[1].pt,'#22c55e',1]].forEach(function(b){
+      var h=b[0]/mx*ch,bx=gx+b[2]*46;
+      s+='<rect class="bar" x="'+bx+'" y="'+(T+ch-h)+'" width="38" height="'+h+'" rx="4" fill="'+b[1]+'"/><text x="'+(bx+19)+'" y="'+(T+ch-h-5)+'" text-anchor="middle" font-size="10.5" font-weight="700" fill="var(--ink)">'+tick(b[0])+'</text>';
+    });
+    s+='<text x="'+(gx+42)+'" y="'+(H-12)+'" text-anchor="middle" font-size="12" fill="var(--ink)">'+x[0]+'</text>';
+  });
+  return s+'</svg><div class="legend"><span><i style="background:#3b82f6"></i>Mission Waste</span><span><i style="background:#22c55e"></i>Pallet Weight</span><span style="color:var(--muted)">KG</span></div>';
+}
+function dashShift(){
+  var d=today(),day=sumShift(d,'Day Shift'),ng=sumShift(d,'Night Shift'),all=combine(day,ng),v=verdict(all);
+  var h='<div class="tiles stage">'+tile('t-blue','Mission Waste',n2(all.mt),'kg')+tile('t-green','Pallet Weight',n2(all.pt),'kg')+tile('t-orange','Difference',sdiff(all.diff),'kg')+tile('t-purple','Status',v.k==='match'?'Match':v.k==='mismatch'?'Mismatch':'No records','')+'</div>';
+  h+='<div class="grid two" style="margin-top:16px"><div class="card"><h2>Shift Wise Report</h2><p class="hint">Today, shifts with a shift chosen</p>'+shiftBars(day,ng)+'</div>'
+   +'<div class="card"><h2>Daily Summary</h2><p class="hint">Day + Night, '+short(new Date())+'</p><div class="stat"><span>Total Missions</span><b class="num">'+all.missions+'</b><span>Total Pallets</span><b class="num">'+all.p.length+'</b><span>Mission Total</span><b class="num">'+n2(all.mt)+' kg</b><span>Pallet Total</span><b class="num">'+n2(all.pt)+' kg</b><span>Difference</span><b class="num">'+sdiff(all.diff)+' kg</b></div>'
+   +'<div style="margin-top:14px"><span class="verdict '+v.k+'">'+(v.k==='match'?'Weight Matched':v.k==='mismatch'?'Weight Mismatch':'No records yet')+'</span></div><div style="margin-top:14px"><a class="btn ghost sm" href="#shift-check">Open full Shift Check</a></div></div></div>';
+  return h;
+}
+function visLite(){
+  var v='auto';try{v=localStorage.getItem('pbwm_vis')||'auto'}catch(e){}
+  if(v==='lite')return true;if(v==='full')return false;
+  return (navigator.hardwareConcurrency&&navigator.hardwareConcurrency<=2)||(navigator.deviceMemory&&navigator.deviceMemory<=2)||(window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches);
+}
+function applyVis(){document.documentElement.classList.toggle('lite',!!visLite())}
+function visCard(){
+  var v='auto';try{v=localStorage.getItem('pbwm_vis')||'auto'}catch(e){}
+  return '<div class="card" style="margin-top:16px"><h2>Visual mode</h2><p class="hint">Full uses the animated factory scene and 3D cards. Simple turns the scene and animations off for slower phones. Auto picks Simple on weak or battery-saving devices.</p><div class="tabs" role="group" aria-label="Visual mode">'+[['auto','Auto'],['full','Full 3D'],['lite','Simple']].map(function(x){return '<button data-act="vis" data-k="'+x[0]+'" aria-pressed="'+(v===x[0])+'">'+x[1]+'</button>'}).join('')+'</div></div>';
+}
+/* ---------- shift verification ---------- */
+function sumShift(date,shift){
+  var m=Store.records.filter(function(r){return r.date===date&&r.shift===shift});
+  var p=Store.pallets.filter(function(r){return r.date===date&&r.shift===shift});
+  var names={};m.forEach(function(r){names[String(r.mission_name).trim().toLowerCase()]=1});
+  var mt=sum(m,'net_waste'),pt=sum(p,'weight');
+  return {m:m,p:p,missions:Object.keys(names).length,mt:mt,pt:pt,diff:Math.round((mt-pt)*1000)/1000};
+}
+function verdict(s){
+  if(!s.m.length&&!s.p.length)return {k:'none',t:'NO RECORDS'};
+  return s.diff===0?{k:'match',t:'MATCH'}:{k:'mismatch',t:'MISMATCH'};
+}
+function combine(a,b){
+  var names={};a.m.concat(b.m).forEach(function(r){names[String(r.mission_name).trim().toLowerCase()]=1});
+  var mt=Math.round((a.mt+b.mt)*1000)/1000,pt=Math.round((a.pt+b.pt)*1000)/1000;
+  return {m:a.m.concat(b.m),p:a.p.concat(b.p),missions:Object.keys(names).length,mt:mt,pt:pt,diff:Math.round((mt-pt)*1000)/1000};
+}
+function sdiff(v){return (v>0?'+':'')+n2(v)}
+function chkCard(title,sub,s,st){
+  var v=verdict(s);
+  return '<div class="card tilt"><h2>'+esc(title)+'</h2><p class="hint" style="margin:0">'+sub+'</p><div class="row" style="margin-top:10px"><span class="verdict '+v.k+'">'+v.t+'</span><span class="chip '+(st.k==='done'?'good':'warn')+'">'+esc(st.t)+'</span></div>'
+   +'<div class="stat"><span>Number of Missions</span><b class="num">'+s.missions+'</b><span>Mission Waste Total</span><b class="num">'+n2(s.mt)+' kg</b><span>Number of Pallets</span><b class="num">'+s.p.length+'</b><span>Pallet Total</span><b class="num">'+n2(s.pt)+' kg</b><span>Difference (Mission − Pallet)</span><b class="num">'+sdiff(s.diff)+' kg</b></div></div>';
+}
+function dayStatus(date){
+  var a=shiftStatus(date,'Day Shift'),b=shiftStatus(date,'Night Shift');
+  if(a.k==='unset')return a;
+  if(a.k==='done'&&b.k==='done')return {k:'done',t:'Completed'};
+  if(a.k==='wait'&&b.k==='wait')return {k:'wait',t:'Not started'};
+  return {k:'live',t:'In progress'};
+}
+function viewShiftCheck(){
+  var d=S.chkDate,day=sumShift(d,'Day Shift'),ng=sumShift(d,'Night Shift'),all=combine(day,ng);
+  var noShift=Store.records.filter(function(r){return r.date===d&&!r.shift}).length+Store.pallets.filter(function(r){return r.date===d&&!r.shift}).length;
+  var h=bn('Shift verification','Mission Waste Total minus Pallet Total. MATCH means the difference is exactly zero.');
+  h+='<div class="card"><div class="row" style="justify-content:space-between"><div><h2 style="margin:0">Choose the shift date</h2><p class="hint" style="margin:0">A night shift that runs past midnight belongs to the date it started.</p></div><div style="min-width:180px"><input class="in-el" type="date" id="chk-date" value="'+esc(d)+'" aria-label="Shift date"></div></div></div>';
+  if(!shiftsSet())h+='<div class="note">Shift start and end times are not set yet, so Completed status cannot be worked out. An Admin can set them in Settings.</div>';
+  if(noShift)h+='<div class="note">'+noShift+' record'+(noShift===1?'':'s')+' on this date have no shift and are not counted below. An Admin can open them in Database and choose a shift.</div>';
+  h+='<div class="chk stage">'+chkCard('Day Shift',esc(shiftLine('Day Shift')),day,shiftStatus(d,'Day Shift'))+chkCard('Night Shift',esc(shiftLine('Night Shift')),ng,shiftStatus(d,'Night Shift'))+chkCard('Daily combined','Day + Night for '+esc(d),all,dayStatus(d))+'</div>';
+  [['Day Shift',day],['Night Shift',ng]].forEach(function(x){
+    var v=verdict(x[1]);
+    if(v.k==='mismatch')h+='<div class="note" style="margin-top:16px;border-color:var(--bad)"><b>'+x[0]+' does not match.</b> Mission waste is '+n2(x[1].mt)+' kg and pallets are '+n2(x[1].pt)+' kg, a difference of '+sdiff(x[1].diff)+' kg. Check the weights and the entries below.</div>';
+  });
+  h+=shiftDetail('Day Shift',day)+shiftDetail('Night Shift',ng);
+  h+='<div class="card" style="margin-top:16px"><div class="row" style="justify-content:space-between"><div><h2>Download this check</h2><p class="hint" style="margin:0">An HTML file you can open and print from your browser.</p></div><button class="btn" data-act="chk-html">HTML report</button></div></div>';
+  return h;
+}
+function shiftDetail(name,s){
+  var v=verdict(s);
+  var mt=s.m.length?'<div class="tw"><table style="min-width:520px"><thead><tr><th>Mission</th><th class="r">Original waste kg</th><th>Waste given by</th><th>Time</th><th>ID</th></tr></thead><tbody>'+s.m.slice().sort(function(a,b){return (a.time||'').localeCompare(b.time||'')}).map(function(r){return '<tr><td>'+esc(r.mission_name)+demoTag(r)+'</td><td class="r num"><b>'+n2(r.net_waste)+'</b></td><td>'+(r.given_by?esc(r.given_by):'<span class="who">—</span>')+'</td><td class="num">'+esc(r.time)+'</td><td class="num">'+esc(r.id)+'</td></tr>'}).join('')+'<tr><td><b>Total</b></td><td class="r num"><b>'+n2(s.mt)+'</b></td><td colspan="3"></td></tr></tbody></table></div>':'<p class="hint" style="margin:0">No mission waste recorded.</p>';
+  var pt=s.p.length?'<div class="tw"><table style="min-width:460px"><thead><tr><th class="r">Pallet no.</th><th class="r">Weight kg</th><th>Pallet waste collected by</th><th>Time</th><th>ID</th></tr></thead><tbody>'+s.p.slice().sort(function(a,b){return (Number(a.pallet_no)||0)-(Number(b.pallet_no)||0)}).map(function(r){return '<tr><td class="r num">'+esc(r.pallet_no)+'</td><td class="r num"><b>'+n2(r.weight)+'</b></td><td>'+(r.collected_by?esc(r.collected_by):'<span class="who">—</span>')+'</td><td class="num">'+esc(r.time)+'</td><td class="num">'+esc(r.id)+demoTag(r)+'</td></tr>'}).join('')+'<tr><td><b>Total</b></td><td class="r num"><b>'+n2(s.pt)+'</b></td><td colspan="3"></td></tr></tbody></table></div>':'<p class="hint" style="margin:0">No pallets recorded.</p>';
+  return '<div class="card" style="margin-top:16px"><div class="row" style="justify-content:space-between"><h2 style="margin:0">'+name+' report</h2><span class="verdict '+v.k+'">'+v.t+'</span></div>'
+   +'<div class="stat"><span>Number of Missions</span><b class="num">'+s.missions+'</b><span>Number of Pallets</span><b class="num">'+s.p.length+'</b><span>Total mission waste</span><b class="num">'+n2(s.mt)+' kg</b><span>Total pallet waste</span><b class="num">'+n2(s.pt)+' kg</b><span>Difference</span><b class="num">'+sdiff(s.diff)+' kg</b></div>'
+   +'<h3 style="margin:18px 0 8px;font-size:15px">Mission waste</h3>'+mt+'<h3 style="margin:18px 0 8px;font-size:15px">Pallets</h3>'+pt+'</div>';
+}
+function shiftLine(sh){var c=shiftCfg(sh);return tmin(c.start)==null?'Times not set':c.start+' to '+c.end}
+function chkHtml(){
+  var d=S.chkDate,day=sumShift(d,'Day Shift'),ng=sumShift(d,'Night Shift'),all=combine(day,ng);
+  var row=function(n,s){var v=verdict(s);return '<tr><td>'+n+'</td><td class="r">'+s.missions+'</td><td class="r">'+n2(s.mt)+'</td><td class="r">'+s.p.length+'</td><td class="r">'+n2(s.pt)+'</td><td class="r">'+sdiff(s.diff)+'</td><td><b>'+v.t+'</b></td></tr>'};
+  return '<!doctype html><html><head><meta charset="utf-8"><title>Shift Check '+esc(d)+'</title><style>body{font:14px/1.5 Arial,sans-serif;margin:32px;color:#111}table{border-collapse:collapse;margin:12px 0}th,td{border:1px solid #bbb;padding:6px 10px;text-align:left}.r{text-align:right}</style></head><body><h1>Paper Bag Shift Check</h1><div>Shift date '+esc(d)+'</div><table><tr><th>Shift</th><th>Missions</th><th>Mission waste kg</th><th>Pallets</th><th>Pallet kg</th><th>Difference kg</th><th>Status</th></tr>'+row('Day Shift',day)+row('Night Shift',ng)+row('Daily combined',all)+'</table>'+[['Day Shift',day],['Night Shift',ng]].map(function(x){var s=x[1];return '<h2>'+x[0]+' ('+verdict(s).t+')</h2><p>Missions: '+s.missions+' · Pallets: '+s.p.length+' · Mission total '+n2(s.mt)+' kg · Pallet total '+n2(s.pt)+' kg · Difference '+sdiff(s.diff)+' kg</p><table><tr><th>Mission</th><th>Original waste kg</th><th>Waste given by</th></tr>'+s.m.map(function(r){return '<tr><td>'+esc(r.mission_name)+'</td><td class="r">'+n2(r.net_waste)+'</td><td>'+esc(r.given_by||'')+'</td></tr>'}).join('')+'</table><table><tr><th>Pallet no.</th><th>Weight kg</th><th>Pallet waste collected by</th></tr>'+s.p.map(function(r){return '<tr><td>'+esc(r.pallet_no)+'</td><td class="r">'+n2(r.weight)+'</td><td>'+esc(r.collected_by||'')+'</td></tr>'}).join('')+'</table>'}).join('')+'</body></html>';
+}
+function shiftCard(){
+  var d=today(),day=sumShift(d,'Day Shift'),ng=sumShift(d,'Night Shift');
+  var line=function(n,s){var v=verdict(s);return '<div class="prow"><span><b>'+n+'</b><div class="who">'+s.missions+' missions · '+s.p.length+' pallets · diff '+sdiff(s.diff)+' kg</div></span><span class="verdict '+v.k+'">'+v.t+'</span></div>'};
+  return '<div class="card" style="margin-top:16px"><div class="row" style="justify-content:space-between"><h2 style="margin:0">Today\'s shift check</h2><a class="btn ghost sm" href="#shift-check">Open Shift Check</a></div>'+line('Day Shift',day)+line('Night Shift',ng)+'</div>';
+}
+
+function kpi(l,v,s,c){return '<div class="card kpi tilt" style="--kc:'+c+'"><div class="l">'+l+'</div><div class="v num">'+v+'<small>kg</small></div><div class="s">'+s+'</div></div>'}
+function viewDashboard(){
+  var t=today(),a=Store.records.filter(function(r){return r.date===t}),sp=split(a);
+  var h=hero();
+  if(!Store.records.length&&!Store.pallets.length)return h+emptyAll();
+  h+=dashShift();
+  h+='<div class="grid kpis stage" style="margin-top:16px">'+kpi('Total waste today',n2(sp.p+sp.h),'Paper + Handle','var(--blue)')+kpi('Paper waste',n2(sp.p),'Net weight today','var(--paper)')+kpi('Handle waste',n2(sp.h),'Net weight today','var(--handle)')
+    +'<div class="card kpi tilt" style="--kc:var(--good)"><div class="l">Entries today</div><div class="v num">'+a.length+'</div><div class="s">Weighings recorded</div></div></div>';
+  h+=shiftCard();
+  h+='<div class="card" style="margin-top:16px"><h2>Today\'s data collection</h2><p class="hint">All entries for '+short(new Date())+', newest first.</p>'+rowsTable(a)+'</div>';
+  var d7=days(dstr(new Date(Date.now()-6*864e5)),7).map(function(d){var x=split(Store.records.filter(function(r){return r.date===d}));return {label:parseD(d).toLocaleDateString('en-GB',{weekday:'short',day:'numeric'}),a:x.p,b:x.h}});
+  h+='<div class="grid two" style="margin-top:16px"><div class="card"><h2>Last 7 days</h2><p class="hint">Net KG per day</p>'+stacked(d7,'Waste per day for the last 7 days')+'</div>';
+  h+='<div class="card"><h2>Paper vs Handle waste</h2><p class="hint">Net KG today</p>'+donut(sp.p,sp.h)+'</div></div>';
+  h+='<div class="card" style="margin-top:16px"><h2>Recent entries</h2><p class="hint">Latest 6 across all days</p>'+Store.records.slice(0,6).map(function(r){return '<div class="hb" style="grid-template-columns:1fr auto"><span><b>'+esc(r.mission_name)+'</b>'+demoTag(r)+' '+pill(r.waste_type)+'<div style="color:var(--muted);font-size:12px">'+esc(r.date)+' '+esc(r.time)+' · '+esc(r.waste_reason)+'</div></span><b class="num">'+n2(r.net_waste)+' kg</b></div>'}).join('')+'</div>';
+  return h;
+}
+
+function rollSvg(){return '<svg class="roll" viewBox="0 0 160 150" aria-hidden="true"><defs><linearGradient id="rb" x1="0" x2="1"><stop offset="0" stop-color="#1a3a9c"/><stop offset=".45" stop-color="#86adff"/><stop offset="1" stop-color="#1b3797"/></linearGradient><linearGradient id="rt" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#d6e4ff"/><stop offset="1" stop-color="#6f9aff"/></linearGradient><linearGradient id="rp" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d3e3ff"/><stop offset=".5" stop-color="#4a6fd0"/><stop offset="1" stop-color="#1a2f78"/></linearGradient></defs><ellipse cx="80" cy="128" rx="68" ry="17" fill="#0b1538"/><ellipse cx="80" cy="122" rx="68" ry="17" fill="url(#rp)"/><ellipse cx="80" cy="119" rx="58" ry="13" fill="#15245c"/><path d="M38 50v58a42 14 0 0 0 84 0V50z" fill="url(#rb)"/><ellipse cx="80" cy="50" rx="42" ry="14" fill="url(#rt)"/><ellipse cx="80" cy="50" rx="30" ry="9.5" fill="none" stroke="#7d9fe8" stroke-width="2"/><ellipse cx="80" cy="50" rx="16" ry="5" fill="#274aa8"/></svg>'}
+
+function shiftSeg(name,cur){
+  return '<div class="seg" role="radiogroup" aria-label="Shift">'+SHIFTS.map(function(s){return '<label><input type="radio" name="'+name+'" value="'+s+'"'+(cur===s?' checked':'')+'><span style="--c:var(--blue)"><i></i>'+s+'</span></label>'}).join('')+'</div>';
+}
+function shiftHint(){return shiftsSet()?'The shift is suggested from the time. You can change it.':'Shift times are not set yet, so choose the shift yourself. An Admin sets the times in Settings.'}
+function viewAdd(){
+  var e=S.editing?Store.records.find(function(r){return r.id===S.editing}):null;
+  if(S.editing&&!e){S.editing=null}
+  if(!e)autoObj(S.form);
+  var f=e?{date:e.date,time:e.time,mission:e.mission_name,type:e.waste_type,reason:e.waste_reason,gross:e.gross_weight,trolley:e.trolley_weight,notes:e.notes,shift:e.shift||'',given:e.given_by||''}:Object.assign({gross:'',trolley:'',notes:'',given:''},S.form);
+  if(!Store.role.write&&!Store.role.admin)return '<div class="card empty"><b>Read-only access</b>Your account can view records but not add them. Ask an Admin for access.</div>';
+  var h=bn(myRole()==='mission'?'Mission Waste Record':'Record a weighing','Weigh the full trolley, then the empty one. The net waste is calculated for you.');
+  if(S.saved){var r=S.saved;h+='<div class="ok-panel" role="status"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M7 12.5l3.2 3.2L17 9"/></svg><div><b>Record saved · ID '+esc(r.id)+'</b>'+esc(r.mission_name)+' · '+esc(r.waste_type)+' · net '+n2(r.net_waste)+' kg ('+esc(r.shift||'no shift')+', '+esc(r.date)+' '+esc(r.time)+')</div></div>';S.saved=null}
+  if(e)h+='<div class="note">Editing record '+esc(e.id)+' from '+esc(e.date)+' '+esc(e.time)+'. <button class="btn ghost sm" data-act="cancel-edit">Cancel edit</button></div>';
+  h+='<div class="grid two"><form class="card" id="wf" novalidate><h2>'+(e?'Edit waste record':'New waste record')+'</h2><p class="hint">Weigh the full trolley, then the empty trolley. Net waste is worked out for you.</p><div class="fields">'
+  +'<label class="f">Date<input class="in-el" type="date" id="f-date" value="'+esc(f.date)+'" required><span class="err" id="e-date"></span></label>'
+  +'<label class="f">Time<input class="in-el" type="time" id="f-time" value="'+esc(f.time)+'" required><span class="err" id="e-time"></span></label>'
+  +'<div class="f span2">Shift'+shiftSeg('sh',f.shift)+'<span class="hint" style="margin:0">'+shiftHint()+'</span><span class="err" id="e-shift"></span></div>'
+  +'<label class="f span2">Mission name<input class="in-el" id="f-mission" list="missions" value="'+esc(f.mission)+'" placeholder="Example: 5 QT" maxlength="60" autocomplete="off" required><datalist id="missions">'+groupBy(Store.records,'mission_name').map(function(m){return '<option value="'+esc(m.l)+'">'}).join('')+'</datalist><span class="err" id="e-mission_name"></span></label>'
+  +'<label class="f span2">Waste Given By<input class="in-el" id="f-given" value="'+esc(f.given)+'" placeholder="Name of the person who brings the waste" maxlength="60" autocomplete="off" required><span class="err" id="e-given_by"></span></label>'
+  +'<div class="f span2">Waste type<div class="seg" role="radiogroup" aria-label="Waste type">'+TYPES.map(function(t){return '<label><input type="radio" name="wt" value="'+t+'"'+(f.type===t?' checked':'')+'><span style="--c:'+TCOL[t]+'"><i></i>'+t+'</span></label>'}).join('')+'</div><span class="err" id="e-waste_type"></span></div>'
+  +'<label class="f">Gross weight (KG)<input class="in-el num" id="f-gross" type="number" inputmode="decimal" step="0.01" min="0" value="'+esc(f.gross)+'" placeholder="0.00" required><span class="err" id="e-gross_weight"></span></label>'
+  +'<label class="f">Empty trolley weight (KG)<input class="in-el num" id="f-trolley" type="number" inputmode="decimal" step="0.01" min="0" value="'+esc(f.trolley)+'" placeholder="0.00" required><span class="err" id="e-trolley_weight"></span></label>'
+  +'<label class="f span2">Waste reason<select class="in-el" id="f-reason">'+REASONS.map(function(x){return '<option'+(f.reason===x?' selected':'')+'>'+x+'</option>'}).join('')+'</select><span class="err" id="e-waste_reason"></span></label>'
+  +'<label class="f span2">Notes (optional)<textarea class="in-el" id="f-notes" maxlength="500" placeholder="Anything the next shift should know">'+esc(f.notes)+'</textarea></label></div>'
+  +'<div class="row" style="margin-top:16px"><button class="btn" type="submit" id="savebtn">'+(e?'Save changes':'Save record')+'</button>'+(e?'':'<button class="btn ghost" type="button" data-act="reset-form">Clear weights</button>')+'</div></form>'
+  +'<div class="card" style="align-self:start"><h2>Net waste</h2><p class="hint">Gross weight minus empty trolley weight</p>'+rollSvg()+'<div class="net" id="netbox"><div class="t">Net waste</div><div class="v num" id="netv">0.00 kg</div><div id="netm" class="t" style="margin-top:4px;text-transform:none;letter-spacing:0"></div></div></div></div>';
+  return h;
+}
+function checkedVal(n){return (document.querySelector('input[name='+n+']:checked')||{}).value||''}
+function readForm(){
+  return {date:$('#f-date').value,time:$('#f-time').value,shift:checkedVal('sh'),given_by:$('#f-given').value,mission_name:$('#f-mission').value,waste_type:checkedVal('wt'),
+    gross_weight:parseFloat($('#f-gross').value),trolley_weight:parseFloat($('#f-trolley').value),waste_reason:$('#f-reason').value,notes:$('#f-notes').value};
+}
+function updateNet(){
+  var g=parseFloat($('#f-gross').value),t=parseFloat($('#f-trolley').value),b=$('#netbox'),v=$('#netv'),m=$('#netm');
+  if(!isFinite(g)||!isFinite(t)){b.className='net';v.textContent='0.00 kg';m.textContent='Enter both weights';return}
+  if(g<0||t<0){b.className='net bad';v.textContent='Not valid';m.textContent='Weights cannot be negative';return}
+  if(g<t){b.className='net bad';v.textContent=n2(g-t)+' kg';m.textContent='Gross is less than the trolley. Check both weights.';return}
+  b.className='net ok';v.textContent=n2(net(g,t))+' kg';m.textContent=n2(g)+' − '+n2(t);
+}
+function showErrors(e){
+  ['date','time','shift','given_by','mission_name','waste_type','gross_weight','trolley_weight','waste_reason'].forEach(function(k){
+    var el=$('#e-'+k);if(el)el.textContent=e[k]||'';
+    var inp={date:'#f-date',time:'#f-time',mission_name:'#f-mission',given_by:'#f-given',gross_weight:'#f-gross',trolley_weight:'#f-trolley',waste_reason:'#f-reason'}[k];
+    if(inp){var i=$(inp);if(i)i.setAttribute('aria-invalid',e[k]?'true':'false')}
+  });
+}
+/* the time, shift and date fields follow each other until the person changes one by hand */
+function syncShiftFields(o,prefix){
+  autoObj(o);
+  var d=$('#'+prefix+'-date');if(d&&d.value!==o.date)d.value=o.date;
+  var r=document.querySelector('input[name='+(prefix==='f'?'sh':'psh')+'][value="'+o.shift+'"]');if(r)r.checked=true;
+}
+function submitForm(ev){
+  ev.preventDefault();
+  var r=readForm(),e=validate(r);if(!r.shift)e.shift='Choose Day Shift or Night Shift.';if(!String(r.given_by||'').trim())e.given_by='Enter the name of the person who gave the waste.';showErrors(e);
+  if(Object.keys(e).length){var first=document.querySelector('[aria-invalid="true"]');if(first)first.focus();toast('Please fix the highlighted fields.');return}
+  var editing=S.editing?Store.records.find(function(x){return x.id===S.editing}):null;
+  if(editing){r.id=editing.id;if(editing.demo)r.demo=true;}
+  var rec=clean(r),btn=$('#savebtn');btn.disabled=true;
+  Store.put(rec,!editing).then(function(saved){
+    rec=saved;S.saved=rec;S.form.time=nowT();S.form.mission=rec.mission_name;S.form.type=rec.waste_type;S.form.reason=rec.waste_reason;
+    if(editing){S.editing=null;toast('Changes saved');location.hash='#database';return}
+    S.form.dateTouched=false;render();toast('Record saved');
+  }).catch(function(err){btn.disabled=false;toast(err&&err.code==='quota_exceeded'?'The database is full. Ask an Admin to delete old records.':'Could not save. Check your connection and try again.')});
+}
+
+/* ---------- pallet form ---------- */
+function palCount(){return Math.max(1,Math.min(60,S.pal.list.length))}
+function palWeights(list){return list.map(function(v,i){return '<label class="f">Pallet '+(i+1)+' weight (KG)<input class="in-el num pwi" data-i="'+i+'" type="number" inputmode="decimal" step="0.01" min="0" value="'+esc(v)+'" placeholder="0.00"></label>'}).join('')}
+function palTotal(list){var t=0;list.forEach(function(v){var n=parseFloat(v);if(isFinite(n)&&n>0)t+=n});return Math.round(t*1000)/1000}
+function nextPalNo(date,shift){var m=0;Store.pallets.forEach(function(p){if(p.date===date&&p.shift===shift)m=Math.max(m,Number(p.pallet_no)||0)});return m+1}
+function viewAddPallet(){
+  var e=S.editingP?Store.pallets.find(function(r){return r.id===S.editingP}):null;
+  if(S.editingP&&!e)S.editingP=null;
+  if(!Store.role.write&&!Store.role.admin)return '<div class="card empty"><b>Read-only access</b>Your account can view records but not add them. Ask an Admin for access.</div>';
+  if(!e){autoObj(S.pal);if(!S.pal.list.length)S.pal.list=['']}
+  var f=e?{date:e.date,time:e.time,shift:e.shift,by:e.collected_by||''}:S.pal;
+  var h=bn(myRole()==='pallet'?'Pallet Record':'Record pallets','Choose the date and shift, then enter each pallet weight. The total is added for you.');
+  if(S.palSaved){var s=S.palSaved;h+='<div class="ok-panel" role="status"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M7 12.5l3.2 3.2L17 9"/></svg><div><b>'+s.n+' pallet'+(s.n===1?'':'s')+' saved · total '+n2(s.total)+' kg</b>'+esc(s.shift)+' · '+esc(s.date)+' · IDs '+esc(s.ids)+'</div></div>';S.palSaved=null}
+  if(e)h+='<div class="note">Editing pallet record '+esc(e.id)+'. <button class="btn ghost sm" data-act="cancel-edit-p">Cancel edit</button></div>';
+  var body=e?'<label class="f span2">Pallet weight (KG)<input class="in-el num" id="p-w" type="number" inputmode="decimal" step="0.01" min="0" value="'+esc(e.weight)+'" placeholder="0.00"><span class="err" id="e-weight"></span></label>'
+    :'<label class="f span2">Number of pallets<input class="in-el num" id="p-count" type="number" inputmode="numeric" min="1" max="60" step="1" value="'+palCount()+'"></label><div class="f span2"><div class="fields" id="pw">'+palWeights(S.pal.list)+'</div><span class="err" id="e-weight"></span></div>';
+  h+='<div class="grid two"><form class="card" id="pf" novalidate><h2>'+(e?'Edit pallet record':'New pallet record')+'</h2><p class="hint">Pallet records are not linked to any mission. They are checked against the shift total.</p><div class="fields">'
+  +'<label class="f">Date<input class="in-el" type="date" id="p-date" value="'+esc(f.date)+'" required><span class="err" id="e-pdate"></span></label>'
+  +'<label class="f">Time<input class="in-el" type="time" id="p-time" value="'+esc(f.time)+'" required><span class="err" id="e-ptime"></span></label>'
+  +'<div class="f span2">Shift'+shiftSeg('psh',f.shift)+'<span class="hint" style="margin:0">'+shiftHint()+'</span><span class="err" id="e-pshift"></span></div>'
+  +'<label class="f span2">Pallet Waste Collected By<input class="in-el" id="p-by" value="'+esc(f.by||'')+'" placeholder="Name of the person who collects the pallet waste" maxlength="60" autocomplete="off" required><span class="err" id="e-pby"></span></label>'
+  +body+'</div><div class="row" style="margin-top:16px"><button class="btn" type="submit" id="psave">'+(e?'Save changes':'Save pallets')+'</button></div></form>'
+  +'<div class="card" style="align-self:start"><h2>Pallet total</h2><p class="hint">All pallet weights in this entry</p>'+rollSvg()+'<div class="net ok" id="ptbox"><div class="t">Total</div><div class="v num" id="ptv">'+n2(e?e.weight:palTotal(S.pal.list))+' kg</div></div></div></div>';
+  return h;
+}
+function submitPallet(ev){
+  ev.preventDefault();
+  var date=$('#p-date').value,time=$('#p-time').value,shift=checkedVal('psh'),errs={};
+  var editing=S.editingP?Store.pallets.find(function(x){return x.id===S.editingP}):null;
+  var by=$('#p-by').value.trim();if(!by)errs.by='Enter the name of the person who collected the pallet waste.';
+  var ws=editing?[$('#p-w').value]:S.pal.list.slice();
+  var recs=[],base=nextPalNo(date,shift);
+  ws.forEach(function(v,i){
+    var r={date:date,time:time,shift:shift,weight:parseFloat(v),pallet_no:editing?editing.pallet_no:base+i,collected_by:by};
+    var er=validatePallet(r);Object.keys(er).forEach(function(k){errs[k]=er[k]});recs.push(r);
+  });
+  $('#e-pby').textContent=errs.by||'';$('#e-pdate').textContent=errs.date||'';$('#e-ptime').textContent=errs.time||'';$('#e-pshift').textContent=errs.shift||'';$('#e-weight').textContent=errs.weight?(editing?errs.weight:'Every pallet needs a weight more than 0. Remove empty rows by lowering the number of pallets.'):'';
+  if(Object.keys(errs).length){toast('Please fix the highlighted fields.');return}
+  var btn=$('#psave');btn.disabled=true;
+  if(editing){
+    var r0=recs[0];r0.id=editing.id;if(editing.demo)r0.demo=true;
+    Store.put(cleanPallet(r0),false,'pallets').then(function(){S.editingP=null;toast('Changes saved');location.hash='#database'}).catch(function(){btn.disabled=false;toast('Could not save. Try again.')});
+    return;
+  }
+  var ids=[],total=0,fail=0;
+  seq(recs,function(r){return Store.put(cleanPallet(r),true,'pallets').then(function(x){ids.push(x.id);total+=x.weight})},function(f){
+    fail=f;total=Math.round(total*1000)/1000;
+    S.palSaved={n:ids.length,total:total,shift:shift,date:date,ids:ids.length>3?ids[0]+' to '+ids[ids.length-1]:ids.join(', ')};
+    S.pal.list=[''];S.pal.by='';S.pal.time=nowT();S.pal.dateTouched=false;render();
+    toast(fail?'Saved with '+fail+' errors. Check the list.':'Pallets saved');
+  });
+}
+
+function period(kind,anchor){
+  var d=parseD(anchor),f,t,label;
+  if(kind==='daily'){f=t=anchor;label=d.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}
+  else if(kind==='weekly'){var wd=(d.getDay()+6)%7,s=new Date(d);s.setDate(d.getDate()-wd);var e=new Date(s);e.setDate(s.getDate()+6);f=dstr(s);t=dstr(e);label=short(s)+' to '+short(e)}
+  else if(kind==='monthly'){f=dstr(new Date(d.getFullYear(),d.getMonth(),1));t=dstr(new Date(d.getFullYear(),d.getMonth()+1,0));label=d.toLocaleDateString('en-GB',{month:'long',year:'numeric'})}
+  else{f=d.getFullYear()+'-01-01';t=d.getFullYear()+'-12-31';label='Year '+d.getFullYear()}
+  return {from:f,to:t,label:label};
+}
+function reportData(){
+  var k=S.rep.kind,P=period(k,S.rep.anchor);
+  var a=Store.records.filter(function(r){return r.date>=P.from&&r.date<=P.to}),sp=split(a),b=[],title;
+  if(k==='daily'){title='Waste by 6-hour block';[['00–06',0,6],['06–12',6,12],['12–18',12,18],['18–24',18,24]].forEach(function(x){var q=split(a.filter(function(r){var h=parseInt(r.time,10);return h>=x[1]&&h<x[2]}));b.push({label:x[0],a:q.p,b:q.h})})}
+  else if(k==='weekly'){title='Waste by day';days(P.from,7).forEach(function(d){var q=split(a.filter(function(r){return r.date===d}));b.push({label:parseD(d).toLocaleDateString('en-GB',{weekday:'short',day:'numeric'}),a:q.p,b:q.h})})}
+  else if(k==='monthly'){title='Waste by day of month';var n=parseD(P.to).getDate();days(P.from,n).forEach(function(d,i){var q=split(a.filter(function(r){return r.date===d}));b.push({label:String(i+1),a:q.p,b:q.h})})}
+  else{title='Waste by month';var y=parseD(P.from).getFullYear();for(var m=0;m<12;m++){var q=split(a.filter(function(r){return parseInt(r.date.slice(5,7),10)===m+1}));b.push({label:new Date(y,m,1).toLocaleDateString('en-GB',{month:'short'}),a:q.p,b:q.h})}}
+  return {P:P,a:a,sp:sp,b:b,title:title,mission:groupBy(a,'mission_name'),reason:groupBy(a,'waste_reason')};
+}
+function miniTable(items,h1){
+  if(!items.length)return '';
+  return '<details class="dt"><summary>Show table</summary><div class="tw"><table style="min-width:300px"><thead><tr><th>'+h1+'</th><th class="r">Net KG</th></tr></thead><tbody>'+items.map(function(i){return '<tr><td class="wrap">'+esc(i.l)+'</td><td class="r num">'+n2(i.v)+'</td></tr>'}).join('')+'</tbody></table></div></details>';
+}
+function viewReports(){
+  var k=S.rep.kind,d=reportData(),inp;
+  if(k==='monthly')inp='<input class="in-el" type="month" id="rp-anchor" value="'+esc(S.rep.anchor.slice(0,7))+'" aria-label="Choose month">';
+  else if(k==='yearly')inp='<input class="in-el num" type="number" id="rp-anchor" min="2000" max="2100" value="'+esc(S.rep.anchor.slice(0,4))+'" aria-label="Choose year">';
+  else inp='<input class="in-el" type="date" id="rp-anchor" value="'+esc(S.rep.anchor)+'" aria-label="Choose date">';
+  var h=bn(esc(d.P.label),k.charAt(0).toUpperCase()+k.slice(1)+' report · '+esc(d.P.from)+(d.P.from!==d.P.to?' to '+esc(d.P.to):''));
+  h+='<div class="card" style="margin-bottom:16px"><div class="row" style="justify-content:space-between"><div class="tabs" role="group" aria-label="Report period">'+['daily','weekly','monthly','yearly'].map(function(x){return '<button data-act="kind" data-k="'+x+'" aria-pressed="'+(x===k)+'">'+x.charAt(0).toUpperCase()+x.slice(1)+'</button>'}).join('')+'</div><div style="min-width:180px">'+inp+'</div></div></div>';
+  if(!Store.records.length)return h+emptyAll();
+  h+='<div class="grid kpis stage">'+kpi('Total waste',n2(d.sp.p+d.sp.h),'Net weight','var(--blue)')+kpi('Paper waste',n2(d.sp.p),'Net weight','var(--paper)')+kpi('Handle waste',n2(d.sp.h),'Net weight','var(--handle)')+'<div class="card kpi tilt" style="--kc:var(--good)"><div class="l">Entries</div><div class="v num">'+d.a.length+'</div><div class="s">In this period</div></div></div>';
+  h+='<div class="grid two" style="margin-top:16px"><div class="card"><h2>'+d.title+'</h2><p class="hint">Net KG, Paper and Handle stacked</p>'+stacked(d.b,d.title+' for '+d.P.label)
+    +'<details class="dt"><summary>Show table</summary><div class="tw"><table style="min-width:360px"><thead><tr><th>Period</th><th class="r">Paper kg</th><th class="r">Handle kg</th><th class="r">Total kg</th></tr></thead><tbody>'+d.b.map(function(x){return '<tr><td>'+esc(x.label)+'</td><td class="r num">'+n2(x.a)+'</td><td class="r num">'+n2(x.b)+'</td><td class="r num"><b>'+n2(x.a+x.b)+'</b></td></tr>'}).join('')+'</tbody></table></div></details></div>'
+    +'<div class="card"><h2>Paper vs Handle waste</h2><p class="hint">Share of net KG</p>'+donut(d.sp.p,d.sp.h)+'</div></div>';
+  h+='<div class="grid two even" style="margin-top:16px"><div class="card"><h2>Mission-wise waste</h2><p class="hint">Net KG per mission</p>'+hbars(d.mission,'var(--blue)')+miniTable(d.mission,'Mission')+'</div><div class="card"><h2>Reason-wise waste</h2><p class="hint">Net KG per reason</p>'+hbars(d.reason,'var(--handle)')+miniTable(d.reason,'Reason')+'</div></div>';
+  h+='<div class="card" style="margin-top:16px"><div class="row" style="justify-content:space-between"><div><h2>Download this report</h2><p class="hint" style="margin:0">CSV opens in Excel. The HTML report can be opened in a browser and printed or saved as PDF from there.</p></div><div class="row"><button class="btn ghost" data-act="rep-csv">CSV</button><button class="btn" data-act="rep-html">HTML report</button></div></div></div>';
+  return h;
+}
+
+function dbFiltered(){
+  var f=S.db,q=f.q.trim().toLowerCase();
+  var a=Store.records.filter(function(r){
+    if(q&&String(r.mission_name).toLowerCase().indexOf(q)<0)return false;
+    if(f.from&&r.date<f.from)return false;if(f.to&&r.date>f.to)return false;
+    if(f.type&&r.waste_type!==f.type)return false;
+    if(f.shift==='none'){if(r.shift)return false}else if(f.shift&&r.shift!==f.shift)return false;
+    return true});
+  a.sort(function(x,y){var c=(x.date+x.time).localeCompare(y.date+y.time);return f.sort==='old'?c:-c});
+  return a;
+}
+function dbFilteredP(){
+  var f=S.db;
+  var a=Store.pallets.filter(function(r){
+    if(f.from&&r.date<f.from)return false;if(f.to&&r.date>f.to)return false;
+    if(f.shift==='none'){if(r.shift)return false}else if(f.shift&&r.shift!==f.shift)return false;
+    return true});
+  a.sort(function(x,y){var c=(x.date+x.time).localeCompare(y.date+y.time);return f.sort==='old'?c:-c});
+  return a;
+}
+function dbKind(){var r=myRole();if(r==='mission')return 'records';if(r==='pallet')return 'pallets';return S.dbkind}
+function emptyPal(){
+  var r=myRole(),btn=(r==='admin'||r==='pallet')&&Store.role.write?'<a class="btn" href="#add-pallet">Add pallet record</a>':'';
+  return '<div class="card empty"><b>No pallet records yet</b>Nothing has been recorded yet.<div class="row" style="justify-content:center;margin-top:14px">'+btn+'</div></div>';
+}
+function dbTable(){
+  var a=dbFiltered(),f=S.db,shown=a.slice(0,f.limit),t=sum(a,'net_waste');
+  return '<div class="row" style="justify-content:space-between;margin-bottom:10px"><span class="chip">'+a.length+' record'+(a.length===1?'':'s')+' · '+n2(t)+' kg net</span>'+(adm()?'<button class="btn ghost sm" data-act="csv-filtered"'+(a.length?'':' disabled')+'>Export these to CSV</button>':'')+'</div>'
+    +rowsTable(shown,{actions:adm()})+(a.length>shown.length?'<div class="row" style="justify-content:center;margin-top:12px"><button class="btn ghost" data-act="more">Show 50 more ('+(a.length-shown.length)+' left)</button></div>':'');
+}
+function dbTableP(){
+  var a=dbFilteredP(),f=S.db,shown=a.slice(0,f.limit),t=sum(a,'weight');
+  return '<div class="row" style="justify-content:space-between;margin-bottom:10px"><span class="chip">'+a.length+' pallet'+(a.length===1?'':'s')+' · '+n2(t)+' kg</span>'+(adm()?'<button class="btn ghost sm" data-act="csv-pal-filtered"'+(a.length?'':' disabled')+'>Export these to CSV</button>':'')+'</div>'
+    +palTable(shown,{actions:adm()})+(a.length>shown.length?'<div class="row" style="justify-content:center;margin-top:12px"><button class="btn ghost" data-act="more">Show 50 more ('+(a.length-shown.length)+' left)</button></div>':'');
+}
+function dbBody(){
+  if(dbKind()==='pallets')return Store.pallets.length?dbTableP():emptyPal();
+  return Store.records.length?dbTable():emptyAll();
+}
+function viewDatabase(){
+  var f=S.db,k=dbKind(),r=myRole();
+  var h=bn('Every record in one place',k==='pallets'?'Search, filter, correct and export the pallet data.':'Search, filter, correct and export the waste data.');
+  var tabs=r==='admin'?'<div class="tabs" role="group" aria-label="Record type" style="margin-bottom:14px"><button data-act="dbkind" data-k="records" aria-pressed="'+(k==='records')+'">Waste records</button><button data-act="dbkind" data-k="pallets" aria-pressed="'+(k==='pallets')+'">Pallet records</button></div>':'';
+  h+='<div class="card"><h2>'+(k==='pallets'?'All pallet records':'All waste records')+'</h2><p class="hint">'+(adm()?'Admins can edit and delete records.':'You can view and add records. Only an Admin can edit or delete one.')+'</p>'+tabs+'<div class="filters">'
+  +(k==='records'?'<label class="f wide">Search mission<input class="in-el" id="d-q" data-f="q" type="search" placeholder="Example: 5 QT" value="'+esc(f.q)+'"></label>':'')
+  +'<label class="f">From<input class="in-el" type="date" data-f="from" value="'+esc(f.from)+'"></label>'
+  +'<label class="f">To<input class="in-el" type="date" data-f="to" value="'+esc(f.to)+'"></label>'
+  +'<label class="f">Shift<select class="in-el" data-f="shift"><option value="">All shifts</option>'+SHIFTS.map(function(s){return '<option'+(f.shift===s?' selected':'')+'>'+s+'</option>'}).join('')+'<option value="none"'+(f.shift==='none'?' selected':'')+'>No shift</option></select></label>'
+  +(k==='records'?'<label class="f">Waste type<select class="in-el" data-f="type"><option value="">All types</option>'+TYPES.map(function(t){return '<option'+(f.type===t?' selected':'')+'>'+t+'</option>'}).join('')+'</select></label>':'')
+  +'<label class="f">Sort<select class="in-el" data-f="sort"><option value="new"'+(f.sort==='new'?' selected':'')+'>Newest first</option><option value="old"'+(f.sort==='old'?' selected':'')+'>Oldest first</option></select></label></div>'
+  +'<div id="dbtable">'+dbBody()+'</div></div>';
+  return h;
+}
+
+/* ---------- settings (Admin) ---------- */
+var SEARCH={q:'',hits:[]};
+function roleRows(){
+  var ids=Object.keys(Store.cfg.roles).filter(function(u){return Store.cfg.roles[u]!=='none'});
+  if(!ids.length)return '<p class="hint" style="margin:0">Nobody has a role yet. Search for a person above and choose a role.</p>';
+  return ids.map(function(u){var r=Store.cfg.roles[u];return '<div class="prow"><span><b class="who" data-uid="'+esc(u)+'" style="color:var(--ink)"></b></span><span class="row"><select class="in-el" data-role-for="'+esc(u)+'" style="min-width:170px"><option value="mission"'+(r==='mission'?' selected':'')+'>Mission Waste Staff</option><option value="pallet"'+(r==='pallet'?' selected':'')+'>Pallet Staff</option></select><button class="btn ghost sm" data-act="role-remove" data-id="'+esc(u)+'">Remove</button></span></div>'}).join('');
+}
+function hitRows(){
+  if(!SEARCH.hits.length)return SEARCH.q?'<p class="hint" style="margin:8px 0 0">No match.</p>':'';
+  return SEARCH.hits.map(function(h){return '<div class="prow"><span class="who-name" data-hit="'+esc(h.id)+'"></span><span class="row"><button class="btn ghost sm" data-act="role-add" data-id="'+esc(h.id)+'" data-r="mission">Mission Waste Staff</button><button class="btn ghost sm" data-act="role-add" data-id="'+esc(h.id)+'" data-r="pallet">Pallet Staff</button></span></div>'}).join('');
+}
+function viewSettings(){
+  var s=Store.cfg.shifts,cloud=Store.mode==='cloud';
+  var h=bn('Settings','Shift times and who can use which section.');
+  h+='<div class="grid two even"><form class="card" id="sf" novalidate><h2>Shift times</h2><p class="hint">Enter your factory\'s real start and end times. Nothing is assumed. A shift that ends earlier than it starts runs past midnight.</p>'
+  +(shiftsSet()?'':'<div class="note">Shift times are not set yet. Staff will choose the shift by hand until you save them.</div>')
+  +'<div class="fields"><label class="f">Day Shift starts<input class="in-el" type="time" id="s-ds" value="'+esc(s.day.start)+'"></label><label class="f">Day Shift ends<input class="in-el" type="time" id="s-de" value="'+esc(s.day.end)+'"></label>'
+  +'<label class="f">Night Shift starts<input class="in-el" type="time" id="s-ns" value="'+esc(s.night.start)+'"></label><label class="f">Night Shift ends<input class="in-el" type="time" id="s-ne" value="'+esc(s.night.end)+'"></label></div><span class="err" id="e-shifts"></span>'
+  +'<div class="row" style="margin-top:16px"><button class="btn" type="submit">Save shift times</button></div></form>';
+  h+='<div class="card"><h2>Accounts and roles</h2><p class="hint">Admin sees everything. Mission Waste Staff see only the Mission Waste Record section. Pallet Staff see only the Pallet Record section.</p>';
+  if(cloud){
+    h+='<label class="f">Find a person<input class="in-el" id="role-q" type="search" placeholder="Type a name" value="'+esc(SEARCH.q)+'" autocomplete="off"></label><div id="hits">'+hitRows()+'</div><h3 style="margin:18px 0 0;font-size:15px">People with a role</h3><div id="roles">'+roleRows()+'</div>'
+    +'<div class="note" style="margin-top:14px">These roles hide sections in this page. They are not a database lock. Real protection needs the separate sign-in and database rules version.</div>';
+  }else h+='<div class="note">People and roles are available once this page is opened from claude.ai and shared. On this device you are the Admin. Use Preview below to see what each role sees.</div>';
+  h+='</div></div>';
+  h+=visCard();
+  h+='<div class="card" style="margin-top:16px"><h2>Preview as another role</h2><p class="hint">See exactly what Mission Waste Staff or Pallet Staff would see. Nothing changes for them.</p><div class="row"><button class="btn ghost" data-act="preview" data-k="mission">Mission Waste Staff</button><button class="btn ghost" data-act="preview" data-k="pallet">Pallet Staff</button></div></div>';
+  return h;
+}
+function saveShifts(ev){
+  ev.preventDefault();
+  var v={ds:$('#s-ds').value,de:$('#s-de').value,ns:$('#s-ns').value,ne:$('#s-ne').value},er=$('#e-shifts');
+  var any=v.ds||v.de||v.ns||v.ne;
+  if(any){
+    if(!(v.ds&&v.de&&v.ns&&v.ne)){er.textContent='Fill in all four times, or leave all four empty.';return}
+    if(v.ds===v.de||v.ns===v.ne){er.textContent='A shift cannot start and end at the same time.';return}
+    var da=tmin(v.ds),db=tmin(v.de),na=tmin(v.ns),nb=tmin(v.ne);
+    if(inWin(na,da,db)||inWin(da,na,nb)){er.textContent='Day and Night shift times overlap. Check them.';return}
+  }
+  er.textContent='';
+  Store.cfg.shifts={day:{start:v.ds,end:v.de},night:{start:v.ns,end:v.ne}};
+  Store.saveCfg().then(function(){toast('Shift times saved');render()}).catch(function(){toast('Could not save. Try again.')});
+}
+function viewNone(){return '<div class="card empty"><b>No role assigned yet</b>Your account does not have a section yet. Ask an Admin to give you a role.</div>'}
+function viewBackup(){
+  var nr=Store.records.length,np=Store.pallets.length;
+  var h=bn('Keep your data safe','Download a copy of every record, or restore one from a backup file.')+'<div class="grid two even stage">'
+  +'<div class="card tilt"><h2>Export to CSV</h2><p class="hint">Ready for Excel or Google Sheets.</p><div class="row"><button class="btn" data-act="csv-all"'+(nr?'':' disabled')+'>Waste CSV ('+nr+')</button><button class="btn" data-act="csv-pal"'+(np?'':' disabled')+'>Pallet CSV ('+np+')</button></div></div>'
+  +'<div class="card tilt"><h2>JSON backup</h2><p class="hint">One file with waste records, pallet records and shift times. Restoring adds missing records and replaces records with the same ID. It never deletes anything else.</p><div class="row"><button class="btn" data-act="json-backup"'+(nr||np?'':' disabled')+'>Download backup</button><button class="btn ghost" data-act="restore">Restore from file</button></div></div></div>';
+  h+='<div class="card" style="margin-top:16px"><h2>Old records are kept</h2><p class="hint" style="margin:0">This page never deletes old records by itself. A record is removed only when an Admin deletes it and confirms.</p></div>';
+  h+='<div class="card" style="margin-top:16px"><h2>Reports and printing</h2><p class="hint" style="margin:0">Open Reports or Shift Check, download the HTML report, then open that file in your browser to print it or save it as a PDF. Printing straight from this page is not available.</p></div>';
+  h+='<div class="card" style="margin-top:16px"><h2>Demo data</h2><p class="hint">Labelled sample waste and pallet records so you can try the pages. They are marked DEMO and can be removed at any time. Real records are never touched.</p><div class="row"><button class="btn ghost" data-act="demo-load">Load demo data</button><button class="btn ghost" data-act="demo-clear">Remove demo data</button></div></div>';
+  return h;
+}
+
+/* ---------- csv / files ---------- */
+var FIELDS=['id','date','shift','time','mission_name','waste_type','gross_weight','trolley_weight','net_waste','waste_reason','notes','given_by'];
+var PFIELDS=['id','date','shift','pallet_no','weight','time','collected_by'];
+function cell(v){var s=String(v==null?'':v);if(/^[=+\-@\t\r]/.test(s)&&isNaN(Number(s)))s="'"+s;return '"'+s.replace(/"/g,'""')+'"'}
+function toCsv(a,F){F=F||FIELDS;return F.join(',')+'\r\n'+a.map(function(r){return F.map(function(k){return cell(r[k])}).join(',')}).join('\r\n')}
+function saveFile(name,data){
+  if(window.claude&&claude.use){
+    return claude.use('downloads').then(function(dl){
+      if(!dl){toast('Downloads are not available in this view.');return}
+      return dl.save({filename:name,data:data}).then(function(){toast('Saved '+name)}).catch(function(e){if(!e||e.code!=='declined')toast('Could not save the file here.')});
+    });
+  }
+  var u=URL.createObjectURL(new Blob([data]));var a=document.createElement('a');a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(u)},1500);
+  return Promise.resolve();
+}
+function repHtml(d){
+  var t=function(items,h){return '<table><tr><th>'+h+'</th><th>Net KG</th></tr>'+items.map(function(i){return '<tr><td>'+esc(i.l)+'</td><td class="r">'+n2(i.v)+'</td></tr>'}).join('')+'</table>'};
+  return '<!doctype html><html><head><meta charset="utf-8"><title>Paper Bag Waste Report</title><style>body{font:14px/1.5 Arial,sans-serif;margin:32px;color:#111}h1{margin:0 0 4px}table{border-collapse:collapse;margin:8px 0 20px;min-width:320px}th,td{border:1px solid #bbb;padding:6px 10px;text-align:left}.r{text-align:right}.k{display:flex;gap:24px;margin:16px 0}.k div{border:1px solid #bbb;padding:10px 16px}.k b{display:block;font-size:22px}</style></head><body><h1>Paper Bag Waste Report</h1><div>'+esc(d.P.label)+' ('+esc(d.P.from)+' to '+esc(d.P.to)+')</div><div class="k"><div>Total<b>'+n2(d.sp.p+d.sp.h)+' kg</b></div><div>Paper Waste<b>'+n2(d.sp.p)+' kg</b></div><div>Handle Waste<b>'+n2(d.sp.h)+' kg</b></div><div>Entries<b>'+d.a.length+'</b></div></div><h2>Mission-wise</h2>'+t(d.mission,'Mission')+'<h2>Reason-wise</h2>'+t(d.reason,'Reason')+'<h2>Entries</h2><table><tr><th>Date</th><th>Shift</th><th>Time</th><th>Mission</th><th>Type</th><th>Gross</th><th>Trolley</th><th>Net</th><th>Reason</th><th>Waste given by</th></tr>'+d.a.map(function(r){return '<tr><td>'+esc(r.date)+'</td><td>'+esc(r.shift||'')+'</td><td>'+esc(r.time)+'</td><td>'+esc(r.mission_name)+'</td><td>'+esc(r.waste_type)+'</td><td class="r">'+n2(r.gross_weight)+'</td><td class="r">'+n2(r.trolley_weight)+'</td><td class="r">'+n2(r.net_waste)+'</td><td>'+esc(r.waste_reason)+'</td><td>'+esc(r.given_by||'')+'</td></tr>'}).join('')+'</table></body></html>';
+}
+
+/* ---------- demo data (labelled) ---------- */
+function demoRecords(){
+  var out=[],pal=[],seed=7,rnd=function(){seed=(seed*9301+49297)%233280;return seed/233280};
+  var missions=['5 QT','3 QT','8 QT'],pn=0;
+  for(var i=0;i<10;i++){var d=new Date();d.setDate(d.getDate()-i);var ds=dstr(d);
+    var tot={'Day Shift':0,'Night Shift':0};
+    for(var k=0;k<3;k++){
+      var sh=k<2?'Day Shift':'Night Shift';
+      var tr=Math.round((18+rnd()*4)*100)/100,gross=Math.round((tr+6+rnd()*34)*100)/100,type=rnd()<.62?'Paper Waste':'Handle Waste';
+      var reason=type==='Handle Waste'?['Handle Damage','Machine Setting Problem','Unknown'][Math.floor(rnd()*3)]:['Paper Damage','Cutting Problem','Printing Problem','Material Quality Problem','Operator Error'][Math.floor(rnd()*5)];
+      var hr=sh==='Day Shift'?9+k*3:21;
+      var rec=clean({id:'D'+(i*3+k+1)+'A',date:ds,time:p2(hr)+':'+p2(Math.floor(rnd()*60)),shift:sh,mission_name:missions[Math.floor(rnd()*3)],waste_type:type,gross_weight:gross,trolley_weight:tr,waste_reason:reason,notes:'',given_by:['Ravi','Anil','Sujith'][Math.floor(rnd()*3)],demo:true});
+      out.push(rec);tot[sh]=Math.round((tot[sh]+rec.net_waste)*1000)/1000;
+    }
+    ['Day Shift','Night Shift'].forEach(function(sh,si){
+      var n=2+Math.floor(rnd()*2),left=tot[sh],bad=(i%4===1&&si===1);
+      for(var j=0;j<n;j++){
+        var w=j===n-1?left:Math.round(left/(n-j)*100)/100;
+        left=Math.round((left-w)*1000)/1000;
+        if(bad&&j===n-1)w=Math.round((w+1.5)*1000)/1000;
+        pn++;pal.push(cleanPallet({id:'DP'+pn+'A',date:ds,shift:sh,pallet_no:j+1,weight:w,time:sh==='Day Shift'?'15:30':'22:30',collected_by:['Sajan','Biju'][si],demo:true}));
+      }
+    });
+  }
+  return {records:out,pallets:pal};
+}
+function seq(list,fn,done){
+  var i=0,fail=0;(function next(){if(i>=list.length)return done(fail);var x=list[i++];fn(x).then(next,function(){fail++;next()})})();
+}
+
+/* ---------- modal ---------- */
+function openModal(html){var m=$('#modal');m.innerHTML='<div class="modal" data-act="modal-bg"><div class="box" role="dialog" aria-modal="true">'+html+'</div></div>';m.hidden=false;var b=m.querySelector('button');if(b)b.focus()}
+function closeModal(){var m=$('#modal');m.hidden=true;m.innerHTML=''}
+
+/* ---------- router ---------- */
+var ROUTES={'dashboard':['Dashboard',viewDashboard],'add-record':['Add Waste Record',viewAdd],'add-pallet':['Add Pallet Record',viewAddPallet],'shift-check':['Shift Check',viewShiftCheck],'reports':['Reports',viewReports],'database':['Database',viewDatabase],'backup':['Backup & Export',viewBackup],'settings':['Settings',viewSettings],'none':['No access',viewNone]};
+function allowed(){return NAV[myRole()].map(function(x){return x[0]})}
+function navHtml(tab){
+  if(!Store.roleReady)return '';
+  return NAV[myRole()].map(function(x){return '<a href="#'+x[0]+'" data-r="'+x[0]+'"><svg viewBox="0 0 24 24">'+x[2]+'</svg>'+esc(tab?x[3]:x[1])+'</a>'}).join('');
+}
+function roleName(){return ROLE_LABEL[myRole()]+(S.preview?' (preview)':'')}
+function chrome(){
+  var cloud=Store.mode==='cloud';
+  $('#chips').innerHTML='<span class="chip">'+esc(roleName())+'</span><span class="chip '+(cloud?'good':'warn')+'">'+(cloud?'Shared database':'This device only')+'</span>';
+  $('#sidefoot').innerHTML='Role: <b style="color:#fff">'+esc(roleName())+'</b><br>'+(cloud?'Shared database connected':'Saved on this device only');
+  var sig=myRole()+'|'+Store.roleReady;
+  if(chrome.sig!==sig){chrome.sig=sig;$('#sidenav').innerHTML=navHtml(false);$('#tabnav').innerHTML=navHtml(true)}
+  document.querySelectorAll('[data-r]').forEach(function(a){if(a.getAttribute('data-r')===S.route)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current')});
+  var s='';
+  if(S.preview)s+='<div class="note">Previewing as <b>'+esc(ROLE_LABEL[S.preview])+'</b>. Nothing here changes for real staff. <button class="btn ghost sm" data-act="exit-preview">Exit preview</button></div>';
+  if(!Store.ready||!Store.roleReady)s+='<div class="note">Loading records…</div>';
+  else if(Store.slow)s+='<div class="note">The database is slow to answer. The data shown may be out of date.</div>';
+  else if(!cloud)s+='<div class="note">Records are saved in this browser only. Open this page while signed in to claude.ai to save to the shared database.</div>';
+  $('#status').innerHTML=s;
+}
+function render(){
+  var al=allowed();
+  if(Store.roleReady&&al.indexOf(S.route)<0)S.route=al[0]||'none';
+  if(!Store.roleReady){chrome();$('#view').innerHTML='<div class="card empty"><b>Loading…</b>Checking your access.</div>';return}
+  var r=ROUTES[S.route]||ROUTES.none;
+  var nv=NAV[myRole()].filter(function(x){return x[0]===S.route})[0];
+  document.title='Paper Bag Waste Monitor';
+  $('#ptitle').textContent=nv?nv[1]:r[0];
+  $('#psub').textContent=new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  chrome();
+  var v=$('#view');v.innerHTML=r[1]();v.classList.remove('enter');void v.offsetWidth;v.classList.add('enter');
+  if(S.route==='add-record'&&$('#wf')){
+    updateNet();$('#wf').addEventListener('submit',submitForm);
+    $('#wf').addEventListener('input',function(e){
+      var id=e.target.id;
+      if(id==='f-gross'||id==='f-trolley')updateNet();
+      if(id==='f-mission')S.form.mission=e.target.value;
+      if(id==='f-time'&&!S.editing){S.form.time=e.target.value;syncShiftFields(S.form,'f')}
+      if(id==='f-date'&&!S.editing){S.form.date=e.target.value;S.form.dateTouched=true}
+    });
+    $('#wf').addEventListener('change',function(e){
+      if(e.target.name==='wt')S.form.type=e.target.value;
+      if(e.target.id==='f-reason')S.form.reason=e.target.value;
+      if(e.target.name==='sh'&&!S.editing){S.form.shift=e.target.value;S.form.shiftTouched=true;if(!S.form.dateTouched){S.form.date=shiftDate(today(),S.form.time,S.form.shift);$('#f-date').value=S.form.date}}
+    });
+  }
+  if(S.route==='add-pallet'&&$('#pf')){
+    $('#pf').addEventListener('submit',submitPallet);
+    var upd=function(){$('#ptv').textContent=n2(S.editingP?parseFloat($('#p-w').value)||0:palTotal(S.pal.list))+' kg'};
+    $('#pf').addEventListener('input',function(e){
+      var id=e.target.id;
+      if(S.editingP){if(id==='p-w')upd();return}
+      if(id==='p-by')S.pal.by=e.target.value;
+      if(id==='p-time'){S.pal.time=e.target.value;syncShiftFields(S.pal,'p')}
+      if(id==='p-date'){S.pal.date=e.target.value;S.pal.dateTouched=true}
+      if(e.target.classList.contains('pwi')){S.pal.list[+e.target.getAttribute('data-i')]=e.target.value;upd()}
+      if(id==='p-count'){
+        var n=parseInt(e.target.value,10);if(!(n>=1))return;n=Math.min(60,n);
+        while(S.pal.list.length<n)S.pal.list.push('');S.pal.list.length=n;
+        $('#pw').innerHTML=palWeights(S.pal.list);upd();
+      }
+    });
+    $('#pf').addEventListener('change',function(e){
+      if(e.target.name==='psh'&&!S.editingP){S.pal.shift=e.target.value;S.pal.shiftTouched=true;if(!S.pal.dateTouched){S.pal.date=shiftDate(today(),S.pal.time,S.pal.shift);$('#p-date').value=S.pal.date}}
+    });
+  }
+  if(S.route==='settings'&&$('#sf')){
+    $('#sf').addEventListener('submit',saveShifts);
+    var rq=$('#role-q');
+    if(rq){
+      var run=function(q){
+        SEARCH.q=q;
+        claude.use('user').then(function(u){return u?u.search(q):[]}).then(function(h){
+          if(SEARCH.q!==q)return;SEARCH.hits=h.filter(function(x){return x.id&&x.id!==Store.me.id}).slice(0,6);
+          $('#hits').innerHTML=hitRows();
+          document.querySelectorAll('[data-hit]').forEach(function(el){var p=SEARCH.hits.filter(function(x){return x.id===el.getAttribute('data-hit')})[0];el.textContent=p?(p.name||'Someone'):''});
+        }).catch(function(){});
+      };
+      rq.addEventListener('input',function(){run(rq.value.trim())});
+      rq.addEventListener('focus',function(){if(!rq.value)run('')});
+    }
+  }
+  fillNames();
+}
+function route(){
+  var h=(location.hash||'').replace('#','');S.route=ROUTES[h]?h:(allowed()[0]||'dashboard');
+  if(S.route!=='add-record'&&S.editing&&!S.keepEdit)S.editing=null;
+  if(S.route!=='add-pallet'&&S.editingP&&!S.keepEdit)S.editingP=null;
+  S.keepEdit=false;window.scrollTo(0,0);render();
+}
+window.addEventListener('hashchange',route);
+
+Store.on(function(){
+  if(S.route==='add-record'||S.route==='add-pallet'||S.route==='settings'&&document.activeElement&&document.activeElement.id==='role-q'){chrome();fillNames();return}   // keep half-typed forms intact
+  var f=document.activeElement;
+  if(S.route==='database'&&$('#dbtable')&&f&&f.dataset&&f.dataset.f){$('#dbtable').innerHTML=dbBody();chrome();fillNames();return}
+  render();
+});
+
+/* ---------- events ---------- */
+var PENDING=null;
+document.addEventListener('click',function(e){
+  var el=e.target.closest('[data-act]');if(!el)return;
+  var act=el.getAttribute('data-act'),id=el.getAttribute('data-id'),kind=el.getAttribute('data-kind')||'records';
+  if(act==='modal-bg'){if(e.target===el)closeModal();return}
+  if(act==='modal-close'){closeModal();PENDING=null;return}
+  if(act==='kind'){S.rep.kind=el.getAttribute('data-k');render();return}
+  if(act==='dbkind'){S.dbkind=el.getAttribute('data-k');S.db.limit=50;render();return}
+  if(act==='vis'){try{localStorage.setItem('pbwm_vis',el.getAttribute('data-k'))}catch(x){}applyVis();render();return}
+  if(act==='preview'){if(!Store.role.admin)return;S.preview=el.getAttribute('data-k');S.route=allowed()[0];location.hash='#'+S.route;render();return}
+  if(act==='exit-preview'){S.preview=null;S.route='settings';location.hash='#settings';render();return}
+  if(act==='edit'){if(!adm())return;S.editing=id;S.keepEdit=true;if(location.hash==='#add-record')render();else location.hash='#add-record';return}
+  if(act==='edit-pallet'){if(!adm())return;S.editingP=id;S.keepEdit=true;if(location.hash==='#add-pallet')render();else location.hash='#add-pallet';return}
+  if(act==='cancel-edit'){S.editing=null;location.hash='#database';return}
+  if(act==='cancel-edit-p'){S.editingP=null;location.hash='#database';return}
+  if(act==='reset-form'){var g=$('#f-gross'),t=$('#f-trolley'),n=$('#f-notes');g.value='';t.value='';n.value='';updateNet();g.focus();return}
+  if(act==='del'){if(!adm())return;
+    var isP=kind==='pallets',r=(isP?Store.pallets:Store.records).find(function(x){return x.id===id});if(!r)return;
+    var what=isP?'Pallet '+esc(r.pallet_no)+' · '+n2(r.weight)+' kg · '+esc(r.shift)+' on '+esc(r.date):esc(r.mission_name)+' · '+esc(r.waste_type)+' · '+n2(r.net_waste)+' kg on '+esc(r.date)+' '+esc(r.time);
+    openModal('<h2>Delete record '+esc(id)+'?</h2><p style="color:var(--muted)">'+what+'. This cannot be undone. Download a backup first if you are not sure.</p><div class="row" style="justify-content:flex-end;margin-top:16px"><button class="btn ghost" data-act="modal-close">Keep it</button><button class="btn danger" data-act="del-ok" data-kind="'+kind+'" data-id="'+esc(id)+'">Delete</button></div>');return}
+  if(act==='del-ok'){if(!adm())return;Store.del(id,kind).then(function(){closeModal();toast('Record deleted')}).catch(function(){toast('Could not delete. Try again.')});return}
+  if(act==='more'){S.db.limit+=50;$('#dbtable').innerHTML=dbBody();fillNames();return}
+  if(act==='csv-all'){if(!adm())return;saveFile('paper-bag-waste-all-'+today()+'.csv','﻿'+toCsv(Store.records));return}
+  if(act==='csv-pal'){if(!adm())return;saveFile('paper-bag-pallets-all-'+today()+'.csv','﻿'+toCsv(Store.pallets,PFIELDS));return}
+  if(act==='csv-filtered'){if(!adm())return;saveFile('paper-bag-waste-filtered-'+today()+'.csv','﻿'+toCsv(dbFiltered()));return}
+  if(act==='csv-pal-filtered'){if(!adm())return;saveFile('paper-bag-pallets-filtered-'+today()+'.csv','﻿'+toCsv(dbFilteredP(),PFIELDS));return}
+  if(act==='rep-csv'){var d=reportData();saveFile('paper-bag-waste-'+S.rep.kind+'-'+d.P.from+'.csv','﻿'+toCsv(d.a));return}
+  if(act==='rep-html'){var d2=reportData();saveFile('paper-bag-waste-report-'+S.rep.kind+'-'+d2.P.from+'.html',repHtml(d2));return}
+  if(act==='chk-html'){saveFile('paper-bag-shift-check-'+S.chkDate+'.html',chkHtml());return}
+  if(act==='json-backup'){if(!adm())return;saveFile('paper-bag-waste-backup-'+today()+'.json',JSON.stringify({app:'paper-bag-waste-monitor',version:2,exported_at:new Date().toISOString(),settings:{shifts:Store.cfg.shifts},records:Store.records,pallets:Store.pallets},null,2));return}
+  if(act==='restore'){if(!adm())return;$('#restorefile').value='';$('#restorefile').click();return}
+  if(act==='restore-ok'){
+    if(!adm()||!PENDING)return;var P=PENDING;PENDING=null;closeModal();toast('Restoring '+(P.r.length+P.p.length)+' records…');
+    seq(P.r,function(x){return Store.put(x)},function(f1){seq(P.p,function(x){return Store.put(x,false,'pallets')},function(f2){var f=f1+f2;toast('Restored '+(P.r.length+P.p.length-f)+' records'+(f?', '+f+' failed':''));render()})});return}
+  if(act==='demo-load'){if(!adm())return;el.disabled=true;toast('Loading demo data…');var D=demoRecords();
+    seq(D.records,function(x){return Store.put(x)},function(f1){seq(D.pallets,function(x){return Store.put(x,false,'pallets')},function(f2){toast(f1+f2?'Demo data loaded with '+(f1+f2)+' errors':'Demo data loaded. Records are marked DEMO.');location.hash='#dashboard';render()})});return}
+  if(act==='demo-clear'){if(!adm())return;var a1=Store.records.filter(function(r){return r.demo}),a2=Store.pallets.filter(function(r){return r.demo});if(!a1.length&&!a2.length){toast('No demo data to remove');return}
+    openModal('<h2>Remove demo data?</h2><p style="color:var(--muted)">This deletes '+a1.length+' demo waste records and '+a2.length+' demo pallet records. Records marked DEMO only. Your real records are not touched. This cannot be undone.</p><div class="row" style="justify-content:flex-end;margin-top:16px"><button class="btn ghost" data-act="modal-close">Cancel</button><button class="btn danger" data-act="demo-clear-ok">Remove demo data</button></div>');return}
+  if(act==='demo-clear-ok'){if(!adm())return;closeModal();var b1=Store.records.filter(function(r){return r.demo}),b2=Store.pallets.filter(function(r){return r.demo});
+    seq(b1,function(x){return Store.del(x.id)},function(){seq(b2,function(x){return Store.del(x.id,'pallets')},function(){toast('Demo data removed');render()})});return}
+  if(act==='role-add'){if(!Store.role.admin)return;Store.cfg.roles[id]=el.getAttribute('data-r');SEARCH={q:'',hits:[]};Store.saveCfg().then(function(){toast('Role saved');render()}).catch(function(){toast('Could not save.')});return}
+  if(act==='role-remove'){if(!Store.role.admin)return;Store.cfg.roles[id]='none';Store.saveCfg().then(function(){toast('Role removed');render()}).catch(function(){toast('Could not save.')});return}
+});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!$('#modal').hidden){closeModal();PENDING=null}});
+document.addEventListener('change',function(e){
+  var el=e.target,u=el.getAttribute&&el.getAttribute('data-role-for');
+  if(u&&Store.role.admin){Store.cfg.roles[u]=el.value;Store.saveCfg().then(function(){toast('Role saved')}).catch(function(){toast('Could not save.')})}
+});
+document.addEventListener('input',function(e){
+  var el=e.target;
+  if(el.id==='rp-anchor'){var v=el.value;if(!v)return;S.rep.anchor=S.rep.kind==='monthly'?v+'-01':S.rep.kind==='yearly'?(v.length===4?v+'-01-01':S.rep.anchor):v;render();return}
+  if(el.id==='chk-date'){if(el.value){S.chkDate=el.value;render()}return}
+  if(el.dataset&&el.dataset.f&&S.route==='database'){S.db[el.dataset.f]=el.value;S.db.limit=50;$('#dbtable').innerHTML=dbBody();fillNames()}
+});
+$('#restorefile').addEventListener('change',function(ev){
+  var f=ev.target.files&&ev.target.files[0];if(!f||!adm())return;
+  if(f.size>8*1024*1024){toast('That file is too large to be a backup.');return}
+  var fr=new FileReader();
+  fr.onload=function(){
+    var data;try{data=JSON.parse(fr.result)}catch(e){toast('That file is not a valid backup.');return}
+    var a=Array.isArray(data)?data:(data&&data.records),pa=(data&&!Array.isArray(data)&&Array.isArray(data.pallets))?data.pallets:[];
+    if(!Array.isArray(a))a=[];
+    if(!a.length&&!pa.length){toast('No records found in that file.');return}
+    var good=[],pg=[],bad=0;
+    a.forEach(function(r){r.gross_weight=Number(r.gross_weight);r.trolley_weight=Number(r.trolley_weight);if(!r||Object.keys(validate(r)).length||!r.id)bad++;else good.push(clean(r))});
+    pa.forEach(function(r){r.weight=Number(r.weight);if(!r||Object.keys(validatePallet(r)).length||!r.id)bad++;else pg.push(cleanPallet(r))});
+    if(!good.length&&!pg.length){toast('No valid records in that file ('+bad+' skipped).');return}
+    var clash=good.filter(function(x){return Store.records.some(function(y){return y.id===x.id})}).length+pg.filter(function(x){return Store.pallets.some(function(y){return y.id===x.id})}).length;
+    PENDING={r:good,p:pg};
+    openModal('<h2>Restore from this file?</h2><p style="color:var(--muted)">The file has '+good.length+' waste records and '+pg.length+' pallet records'+(bad?' ('+bad+' invalid entries will be skipped)':'')+'.</p>'
+      +(clash?'<div class="note" style="border-color:var(--bad)"><b>Warning:</b> '+clash+' records already here have the same ID and will be <b>replaced</b> by the versions in the file.</div>':'<p style="color:var(--muted)">No existing record will be replaced. Nothing is deleted.</p>')
+      +'<p style="color:var(--muted)">Records that are not in the file stay as they are. Download a backup first if you are not sure.</p><div class="row" style="justify-content:flex-end;margin-top:16px"><button class="btn ghost" data-act="modal-close">Cancel</button><button class="btn danger" data-act="restore-ok">Restore now</button></div>');
+  };
+  fr.readAsText(f);
+});
+
+/* pointer tilt for 3D cards */
+(function(){
+  if(!window.matchMedia||!matchMedia('(hover:hover) and (pointer:fine)').matches||matchMedia('(prefers-reduced-motion:reduce)').matches)return;
+  document.addEventListener('pointermove',function(e){
+    var c=e.target.closest&&e.target.closest('.tilt');if(!c||document.documentElement.classList.contains('lite'))return;
+    var r=c.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;
+    c.style.setProperty('--ry',(x*7).toFixed(2)+'deg');c.style.setProperty('--rx',(-y*7).toFixed(2)+'deg');
+  });
+  document.addEventListener('pointerout',function(e){var c=e.target.closest&&e.target.closest('.tilt');if(c&&!c.contains(e.relatedTarget)){c.style.setProperty('--rx','0deg');c.style.setProperty('--ry','0deg')}});
+})();
+
+setInterval(function(){if(S.route==='shift-check'||S.route==='dashboard'){var a=document.activeElement;if(!(a&&/INPUT|SELECT|TEXTAREA/.test(a.tagName)))render()}},60000);
+document.addEventListener('visibilitychange',function(){if(!document.hidden&&(S.route==='shift-check'||S.route==='dashboard'))render()});
+applyVis();
+route();
+Store.init().then(function(){route()});
+})();
+</script>
+<script>if("serviceWorker" in navigator&&location.protocol!=="file:"){navigator.serviceWorker.register("sw.js").catch(function(){})}try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist()}catch(e){}</script></body></html>
+</body></html>
